@@ -1,14 +1,18 @@
 require 'atomic'
 
+require 'metriks/meter'
+require 'metriks/histogram'
+
 class Metriks::Timer
   def initialize
-    @meter = Meter.new
-    @count = Atomic.new(0)
+    @meter     = Metriks::Meter.new
+    @histogram = Metriks::Histogram.new_uniform
   end
 
   def update(duration)
     if duration >= 0
       @meter.mark
+      @histogram.update(duration)
     end
   end
 
@@ -24,7 +28,7 @@ class Metriks::Timer
   end
 
   def count
-    @meter.count
+    @histogram.count
   end
 
   def one_minute_rate

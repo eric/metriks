@@ -1,13 +1,15 @@
 require 'atomic'
 
+require 'metriks/ewma'
+
 class Metriks::Meter
   def initialize
     @count = Atomic.new(0)
     @start_time = Time.now
 
-    @m1_rate  = EWMA.new_m1
-    @m5_rate  = EWMA.new_m5
-    @m15_rate = EWMA.new_m15
+    @m1_rate  = Metriks::EWMA.new_m1
+    @m5_rate  = Metriks::EWMA.new_m5
+    @m15_rate = Metriks::EWMA.new_m15
 
     @thread = Thread.new do
       tick

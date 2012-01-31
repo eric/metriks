@@ -1,7 +1,13 @@
+require 'atomic'
+require 'metriks/uniform_sample'
 
 class Metriks::Histogram
   DEFAULT_SAMPLE_SIZE = 1028
   DEFAULT_ALPHA = 0.015
+
+  def self.new_uniform
+    new(Metriks::UniformSample.new(DEFAULT_SAMPLE_SIZE))
+  end
 
   def initialize(sample)
     @sample   = sample
@@ -42,7 +48,7 @@ class Metriks::Histogram
   end
 
   def variance
-    count < = 1 ? 0.0 : @variance.value[1] / (count - 1)
+    count <= 1 ? 0.0 : @variance.value[1] / (count - 1)
   end
 
   def max=(potential_max)
