@@ -1,4 +1,4 @@
-class MetriksClient::EWMA
+class Metriks::EWMA
   INTERVAL = 5
   SECONDS_PER_MINUTE = 60.0
 

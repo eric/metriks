@@ -1,6 +1,6 @@
-require 'metriks_client/counter'
+require 'metriks/counter'
 
-class MetriksClient::Registry
+class Metriks::Registry
   def initialize
     @mutex   = Mutex.new
     @metrics = {}

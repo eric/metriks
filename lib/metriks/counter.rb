@@ -1,6 +1,6 @@
 require 'atomic'
 
-class MetriksClient::Counter
+class Metriks::Counter
   def initialize
     @value = Atomic.new(0)
   end
