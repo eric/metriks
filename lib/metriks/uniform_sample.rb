@@ -1,3 +1,4 @@
+require 'atomic'
 
 class Metriks::UniformSample
   def initialize(reservoir_size)

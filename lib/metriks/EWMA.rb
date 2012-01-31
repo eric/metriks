@@ -1,3 +1,5 @@
+require 'atomic'
+
 class Metriks::EWMA
   INTERVAL = 5
   SECONDS_PER_MINUTE = 60.0
@@ -10,8 +12,20 @@ class Metriks::EWMA
   M5_ALPHA  = 1 - Math.exp(-INTERVAL / SECONDS_PER_MINUTE / FIVE_MINUTES)
   M15_ALPHA = 1 - Math.exp(-INTERVAL / SECONDS_PER_MINUTE / FIFTEEN_MINUTES)
 
-  def initialize(atomic, interval)
-    @alpha    = atomic
+  def self.new_m1
+    new(M1_ALPHA, INTERVAL)
+  end
+
+  def self.new_m5
+    new(M5_ALPHA, INTERVAL)
+  end
+
+  def self.new_m15
+    new(M15_ALPHA, INTERVAL)
+  end
+
+  def initialize(alpha, interval)
+    @alpha    = alpha
     @interval = interval
 
     @initialized = false
@@ -36,6 +50,6 @@ class Metriks::EWMA
   end
 
   def rate
-
+    @rate.value
   end
 end
