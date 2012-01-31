@@ -1,0 +1,20 @@
+PATH
+  remote: .
+  specs:
+    metriks (0.0)
+      atomic (~> 0.0.9)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    ansi (1.4.2)
+    atomic (0.0.9)
+    turn (0.8.3)
+      ansi
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  metriks!
+  turn
