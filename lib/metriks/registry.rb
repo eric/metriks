@@ -4,9 +4,27 @@ require 'metriks/utilization_timer'
 require 'metriks/meter'
 
 class Metriks::Registry
+  def self.default
+    @default ||= new
+  end
+
   def initialize
-    @mutex   = Mutex.new
+    @mutex = Mutex.new
     @metrics = {}
+  end
+
+  def clear
+    @mutex.synchronize do
+      @metrics.each do |key, metric|
+        metric.stop if metric.respond_to?(:stop)
+      end
+
+      @metrics = {}
+    end
+  end
+
+  def stop
+    clear
   end
 
   def counter(name)
@@ -25,6 +43,12 @@ class Metriks::Registry
     add_or_get(name, Metriks::Meter)
   end
 
+  def get(name)
+    @mutex.synchronize do
+      @metrics[name]
+    end
+  end
+
   def add(name, metric)
     @mutex.synchronize do
       if @metrics[name]
@@ -38,10 +62,12 @@ class Metriks::Registry
   protected
   def add_or_get(name, klass)
     @mutex.synchronize do
-      if metric = @metrics[name] && !metric.is_a?(klass)
-        raise "Metric already defined as '#{metric.class}'"
-      elsif metric
-        return metric
+      if metric = @metrics[name]
+        if !metric.is_a?(klass)
+          raise "Metric already defined as '#{metric.class}'"
+        else
+          return metric
+        end
       else
         @metrics[name] = klass.new
       end
