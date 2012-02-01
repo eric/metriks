@@ -4,6 +4,17 @@ require 'metriks/meter'
 require 'metriks/histogram'
 
 class Metriks::Timer
+  class Context
+    def initialize(timer, start_time)
+      @timer      = timer
+      @start_time = start_time
+    end
+
+    def stop
+      @timer.update(Time.now - @start_time)
+    end
+  end
+
   def initialize
     @meter     = Metriks::Meter.new
     @histogram = Metriks::Histogram.new_uniform
@@ -19,6 +30,10 @@ class Metriks::Timer
   def time(callable = nil, &block)
     callable ||= block
     start_time = Time.now
+
+    if callable.nil?
+      return Context.new(self, start_time)
+    end
 
     begin
       return callable.call
