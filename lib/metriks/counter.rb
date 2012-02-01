@@ -2,18 +2,18 @@ require 'atomic'
 
 class Metriks::Counter
   def initialize
-    @counter = Atomic.new(0)
+    @count = Atomic.new(0)
   end
 
   def clear
-    @counter.value = 0
+    @count.value = 0
   end
 
   def increment(incr = 1)
-    @counter.update { |v| v + incr }
+    @count.update { |v| v + incr }
   end
 
   def count
-    @counter.value
+    @count.value
   end
 end
