@@ -11,10 +11,10 @@ Basic atomic counter. Used as an underlying metric for many of the other
 more advanced metrics.
 
 ``` ruby
-    counter = Metriks.counter('calls')
-    counter.increment
+  counter = Metriks.counter('calls')
+  counter.increment
 
-    puts "calls: #{counter.count}"
+  puts "calls: #{counter.count}"
 ```
 
 
@@ -24,10 +24,10 @@ A meter that measures the mean throughput and the one-, five-, and
 fifteen-minute exponentially-weighted moving average throughputs.
 
 ``` ruby
-    meter = Metriks.meter('requests')
-    meter.mark
+  meter = Metriks.meter('requests')
+  meter.mark
 
-    puts "requests: #{meter.one_minute_rate}"
+  puts "requests: #{meter.one_minute_rate}"
 ```
 
 
@@ -37,17 +37,17 @@ A timer that measures the average time as well as throughput metrics via
 a meter.
 
 ``` ruby
-    timer = Metriks.timer('requests')
-    timer.time do
-      work
-    end
-
-    t = timer.time
+  timer = Metriks.timer('requests')
+  timer.time do
     work
-    t.stop
+  end
 
-    puts "average request time: #{timer.mean}"
-    puts "rate: #{timer.five_minute_rate}/sec"
+  t = timer.time
+  work
+  t.stop
+
+  puts "average request time: #{timer.mean}"
+  puts "rate: #{timer.five_minute_rate}/sec"
 ```
 
 
@@ -57,17 +57,17 @@ A specialized timer that calculates the percentage (between 0 and 1) of
 wall-clock time that was spent.
 
 ``` ruby
-    timer = Metriks.timer('requests')
-    timer.time do
-      work
-    end
-
-    t = timer.time
+  timer = Metriks.timer('requests')
+  timer.time do
     work
-    t.stop
+  end
 
-    puts "average request time: #{timer.mean}"
-    puts "utilization: #{timer.one_minute_rate * 100.0}%"
+  t = timer.time
+  work
+  t.stop
+
+  puts "average request time: #{timer.mean}"
+  puts "utilization: #{timer.one_minute_rate * 100.0}%"
 ```
 
 
