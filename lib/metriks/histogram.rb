@@ -40,7 +40,7 @@ class Metriks::Histogram
   end
 
   def mean
-    count > 0 ? sum.value / count : 0.0
+    count > 0 ? @sum.value / count : 0.0
   end
 
   def stddev

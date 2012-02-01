@@ -47,6 +47,22 @@ class Metriks::Timer
     @meter.mean_rate
   end
 
+  def min
+    @histogram.min
+  end
+
+  def max
+    @histogram.max
+  end
+
+  def mean
+    @histogram.mean
+  end
+
+  def stddev
+    @histogram.stddev
+  end
+
   def stop
     @meter.stop
   end
