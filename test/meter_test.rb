@@ -16,4 +16,13 @@ class MeterTest < Test::Unit::TestCase
 
     assert_equal 1, @meter.count
   end
+
+  def test_one_minute_rate
+    @meter.mark 1000
+
+    # Pretend it's been 5 seconds
+    @meter.tick
+
+    assert_equal 200, @meter.one_minute_rate
+  end
 end

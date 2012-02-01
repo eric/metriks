@@ -3,17 +3,17 @@ require 'atomic'
 require 'metriks/ewma'
 
 class Metriks::Meter
-  def initialize
+  def initialize(averager_klass = Metriks::EWMA)
     @count = Atomic.new(0)
     @start_time = Time.now
 
-    @m1_rate  = Metriks::EWMA.new_m1
-    @m5_rate  = Metriks::EWMA.new_m5
-    @m15_rate = Metriks::EWMA.new_m15
+    @m1_rate  = averager_klass.new_m1
+    @m5_rate  = averager_klass.new_m5
+    @m15_rate = averager_klass.new_m15
 
     @thread = Thread.new do
+      sleep averager_klass::INTERVAL
       tick
-      sleep Metriks::EWMA::INTERVAL
     end
   end
 

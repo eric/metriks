@@ -1,7 +1,7 @@
 require 'atomic'
 
 class Metriks::EWMA
-  INTERVAL = 5
+  INTERVAL = 5.0
   SECONDS_PER_MINUTE = 60.0
 
   ONE_MINUTE      = 1
@@ -39,10 +39,10 @@ class Metriks::EWMA
 
   def tick
     count = @uncounted.swap(0)
-    instant_rate = count / @interval
+    instant_rate = count / @interval.to_f
 
     if @initialized
-      @rate.update { |v| v + (@alpha * (instant_rate - rate )) }
+      @rate.update { |v| v + @alpha * (instant_rate - v) }
     else
       @rate.value = instant_rate
       @initialized
