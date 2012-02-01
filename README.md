@@ -10,10 +10,12 @@ aspects of your ruby.
 Basic atomic counter. Used as an underlying metric for many of the other
 more advanced metrics.
 
+``` ruby
     counter = Metriks.counter('calls')
     counter.increment
 
     puts "calls: #{counter.count}"
+```
 
 
 ### Meters
@@ -21,10 +23,12 @@ more advanced metrics.
 A meter that measures the mean throughput and the one-, five-, and
 fifteen-minute exponentially-weighted moving average throughputs.
 
+``` ruby
     meter = Metriks.meter('requests')
     meter.mark
 
     puts "requests: #{meter.one_minute_rate}"
+```
 
 
 ### Timers
@@ -32,6 +36,7 @@ fifteen-minute exponentially-weighted moving average throughputs.
 A timer that measures the average time as well as throughput metrics via
 a meter.
 
+``` ruby
     timer = Metriks.timer('requests')
     timer.time do
       work
@@ -43,6 +48,7 @@ a meter.
 
     puts "average request time: #{timer.mean}"
     puts "rate: #{timer.five_minute_rate}/sec"
+```
 
 
 ### Utilization Timer
@@ -50,7 +56,7 @@ a meter.
 A specialized timer that calculates the percentage (between 0 and 1) of
 wall-clock time that was spent.
 
-
+``` ruby
     timer = Metriks.timer('requests')
     timer.time do
       work
@@ -62,6 +68,7 @@ wall-clock time that was spent.
 
     puts "average request time: #{timer.mean}"
     puts "utilization: #{timer.one_minute_rate * 100.0}%"
+```
 
 
 ## Credits
