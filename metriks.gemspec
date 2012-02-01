@@ -18,8 +18,8 @@ Gem::Specification.new do |s|
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
-  s.summary     = "Short description used in Gem listings."
-  s.description = "Long description. Maybe copied from the README."
+  s.summary     = "An experimental metrics client"
+  s.description = "An experimental metrics client."
 
   ## List the primary authors. If there are a bunch of authors, it's probably
   ## better to set the email to an email list or something. If you don't have
@@ -57,5 +57,5 @@ Gem::Specification.new do |s|
 
   ## Test files will be grabbed from the file list. Make sure the path glob
   ## matches what you actually use.
-  s.test_files = s.files.select { |path| path =~ /^test\/test_.*\.rb/ }
+  s.test_files = s.files.select { |path| path =~ /^test\/.*_test\.rb/ }
 end
