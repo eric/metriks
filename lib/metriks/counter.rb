@@ -13,6 +13,10 @@ class Metriks::Counter
     @count.update { |v| v + incr }
   end
 
+  def decrement(decr = 1)
+    @count.update { |v| v - decr }
+  end
+
   def count
     @count.value
   end
