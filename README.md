@@ -13,7 +13,7 @@ more advanced metrics.
     counter = Metriks.counter('calls')
     counter.increment
 
-    puts "calls: #{counter.count}" #=> "calls: 1"
+    puts "calls: #{counter.count}"
 
 
 ### Meters
