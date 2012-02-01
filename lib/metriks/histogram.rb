@@ -79,10 +79,7 @@ class Metriks::Histogram
   end
 
   def update_variance(value)
-    done = false
-
-    while !done
-      old_values = @variance.value
+    @variance.update do |old_values|
       new_values = Array.new(2)
       if old_values[0] == -1
         new_values[0] = value
@@ -98,7 +95,7 @@ class Metriks::Histogram
         new_values[1] = new_s
       end
 
-      done = @variance.compare_and_swap(old_values, new_values)
+      new_values
     end
   end
 end
