@@ -28,6 +28,13 @@ class Metriks::SimpleMovingAverage
     @index  = Atomic.new(0)
   end
 
+  def clear
+    @values.each do |value|
+      value.value = nil
+    end
+    @index.value = 0
+  end
+
   def update(value)
     @values[@index.value].update { |v| v ? v + value : value }
   end

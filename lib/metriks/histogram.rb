@@ -18,6 +18,15 @@ class Metriks::Histogram
     @variance = Atomic.new([ -1, 0 ])
   end
 
+  def clear
+    @sample.clear
+    @count.value = 0
+    @min.value = nil
+    @max.value = nil
+    @sum.value = 0
+    @variance.value = [ -1, 0 ]
+  end
+
   def update(value)
     @count.update { |v| v + 1 }
     @sample.update(value)

@@ -33,6 +33,12 @@ class Metriks::EWMA
     @uncounted   = Atomic.new(0)
   end
 
+  def clear
+    @initialized = false
+    @rate.value = 0.0
+    @uncounted.value = 0
+  end
+
   def update(value)
     @uncounted.update { |v| v + value }
   end

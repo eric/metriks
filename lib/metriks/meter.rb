@@ -17,6 +17,14 @@ class Metriks::Meter
     end
   end
 
+  def clear
+    @count.value = 0
+    @start_time = Time.now
+    @m1_rate.clear
+    @m5_rate.clear
+    @m15_rate.clear
+  end
+
   def tick
     @m1_rate.tick
     @m5_rate.tick

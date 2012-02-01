@@ -20,6 +20,11 @@ class Metriks::Timer
     @histogram = Metriks::Histogram.new_uniform
   end
 
+  def clear
+    @meter.clear
+    @histogram.clear
+  end
+
   def update(duration)
     if duration >= 0
       @meter.mark
