@@ -12,8 +12,10 @@ class Metriks::Meter
     @m15_rate = averager_klass.new_m15
 
     @thread = Thread.new do
-      sleep averager_klass::INTERVAL
-      tick
+      loop do
+        sleep averager_klass::INTERVAL
+        tick
+      end
     end
   end
 

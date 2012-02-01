@@ -51,7 +51,7 @@ class Metriks::EWMA
       @rate.update { |v| v + @alpha * (instant_rate - v) }
     else
       @rate.value = instant_rate
-      @initialized
+      @initialized = true
     end
   end
 
