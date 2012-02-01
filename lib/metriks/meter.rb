@@ -13,6 +13,7 @@ class Metriks::Meter
 
     @thread = Thread.new do
       tick
+      sleep Metriks::EWMA::INTERVAL
     end
   end
 
