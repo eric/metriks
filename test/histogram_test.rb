@@ -27,4 +27,12 @@ class HistogramTest < Test::Unit::TestCase
 
     assert_equal 7, @histogram.mean
   end
+
+  def test_2000
+    2000.times do |idx|
+      @histogram.update(idx)
+    end
+
+    assert_equal 1999, @histogram.max
+  end
 end

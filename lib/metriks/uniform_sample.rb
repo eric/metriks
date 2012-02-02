@@ -26,7 +26,7 @@ class Metriks::UniformSample
     else
       idx = rand(new_count)
       if idx < @values.length
-        values[idx] = value
+        @values[idx] = value
       end
     end
   end
