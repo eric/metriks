@@ -57,7 +57,7 @@ A specialized timer that calculates the percentage (between 0 and 1) of
 wall-clock time that was spent.
 
 ``` ruby
-  timer = Metriks.timer('requests')
+  timer = Metriks.utilization_timer('requests')
   timer.time do
     work
   end
