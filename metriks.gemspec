@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'metriks'
-  s.version           = '0.0'
+  s.version           = '0.8.0'
   s.date              = '2010-01-01'
 
   ## Make sure your summary is short. The description may be as long
@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
 
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
-  s.add_dependency('atomic', ["~> 0.0.9"])
+  s.add_dependency('atomic', ["~> 1.0"])
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
