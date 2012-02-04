@@ -81,6 +81,30 @@ wall-clock time that was spent.
   puts "utilization: #{timer.one_minute_rate * 100.0}%"
 ```
 
+
+### Proc Title Reporter
+
+Provides a simple way to get up-to-date statistics from a process by
+updating the proctitle every 5 seconds (default).
+
+```ruby
+
+  reporter = Metriks::Reporter::ProcTitle.new :interval => 5
+
+  reporter.add 'reqs', 'sec' do
+    Metriks.meter('rack.requests').one_minute_rate
+  end
+
+  reporter.start
+```
+
+will display:
+
+```
+501      17015 26.0  1.9 416976 246956 ?       Ss   18:54  11:43 thin reqs: 273.3/sec
+```
+
+
 ## Plans
 
 An incomplete list of things I would like to see added:
@@ -91,7 +115,6 @@ An incomplete list of things I would like to see added:
   * Logger reporter to output metrics on a time interval
   * [Statsd](https://github.com/etsy/statsd) reporter
   * [Librato Metrics](http://metrics.librato.com) reporter
-  * Proctitle reporter that updates the proc title every few seconds
 * Metaprogramming instrumentation hooks like [Shopify's statsd-instrument](https://github.com/Shopify/statsd-instrument)
 
 

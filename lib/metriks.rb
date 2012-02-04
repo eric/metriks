@@ -24,3 +24,4 @@ module Metriks
 end
 
 require 'metriks/registry'
+require 'metriks/reporter/proc_title'
