@@ -14,7 +14,7 @@ To install, add this to your `Gemfile`:
     gem 'metriks', :git => 'git://github.com/eric/metriks.git'
 
 
-## API Overview
+## Metric Overview
 
 ### Counters
 
@@ -81,6 +81,7 @@ wall-clock time that was spent.
   puts "utilization: #{timer.one_minute_rate * 100.0}%"
 ```
 
+## Reporter Overview
 
 ### Proc Title Reporter
 
