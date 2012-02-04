@@ -3,7 +3,18 @@
 This is an experiment in making a threadsafe, low impact library to measure
 aspects of your ruby.
 
-## Overview
+
+## Installing
+
+Everything is still in flux, so for the time being I have been installing
+the gem from git with bundler.
+
+To install, add this to your `Gemfile`:
+
+    gem 'metriks', :git => 'git://github.com/eric/metriks.git'
+
+
+## API Overview
 
 ### Counters
 
@@ -69,6 +80,19 @@ wall-clock time that was spent.
   puts "average request time: #{timer.mean}"
   puts "utilization: #{timer.one_minute_rate * 100.0}%"
 ```
+
+## Plans
+
+An incomplete list of things I would like to see added:
+
+* Rack middleware to measure utilization, throughput and worker time
+* Basic reporters:
+  * Rack endpoint returning JSON
+  * Logger reporter to output metrics on a time interval
+  * [Statsd](https://github.com/etsy/statsd) reporter
+  * [Librato Metrics](http://metrics.librato.com) reporter
+  * Proctitle reporter that updates the proc title every few seconds
+* Metaprogramming instrumentation hooks like [Shopify's statsd-instrument](https://github.com/Shopify/statsd-instrument)
 
 
 ## Credits
