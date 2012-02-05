@@ -3,15 +3,21 @@
 This is an experiment in making a threadsafe, low impact library to measure
 aspects of your ruby.
 
+The library is very much a work-in-progress. It is being developed as
+I find needs while developing [Papertrail](https://papertrailapp.com/).
+
 
 # Installing
 
 Everything is still in flux, so for the time being I have been installing
-the gem from git with bundler.
+the gem from git with bundler. If I get a request, I can definitely start
+releasing a gem.
 
 To install, add this to your `Gemfile`:
 
     gem 'metriks', :git => 'git://github.com/eric/metriks.git'
+
+and re-run `bundle`.
 
 
 # Metric API Overview
@@ -276,13 +282,14 @@ since the process started.
 
 # Reporter Overview
 
+How to get metrics out of the process.
+
 ## Proc Title Reporter
 
 Provides a simple way to get up-to-date statistics from a process by
 updating the proctitle every 5 seconds (default).
 
 ```ruby
-
   reporter = Metriks::Reporter::ProcTitle.new :interval => 5
 
   reporter.add 'reqs', 'sec' do
