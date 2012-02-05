@@ -263,7 +263,7 @@ Returns the fifteen-minute average utilization as a percentage between 0.0 and 1
   puts "utilization: #{meter.fifteen_minute_rater * 100}%"
 ```
 
-### fifteen_minute_utilization()
+### mean_utilization()
 
 Returns the mean (average) utilization as a percentage between 0.0 and 1.0
 since the process started.
