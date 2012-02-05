@@ -14,7 +14,7 @@ To install, add this to your `Gemfile`:
     gem 'metriks', :git => 'git://github.com/eric/metriks.git'
 
 
-# Metric Overview
+# Metric API Overview
 
 ## Counters
 
