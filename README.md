@@ -242,7 +242,7 @@ Returns the one-minute average utilization as a percentage between `0.0` and `1.
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "utilization: #{meter.one_minute_rate * 100}%"
+  puts "utilization: #{meter.one_minute_utilization * 100}%"
 ```
 
 ### five_minute_utilization()
@@ -251,7 +251,7 @@ Returns the five-minute average utilization as a percentage between `0.0` and `1
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "utilization: #{meter.five_minute_rate * 100}%"
+  puts "utilization: #{meter.five_minute_utilization * 100}%"
 ```
 
 ### fifteen_minute_utilization()
@@ -260,7 +260,7 @@ Returns the fifteen-minute average utilization as a percentage between `0.0` and
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "utilization: #{meter.fifteen_minute_rate * 100}%"
+  puts "utilization: #{meter.fifteen_minute_utilization * 100}%"
 ```
 
 ### mean_utilization()
