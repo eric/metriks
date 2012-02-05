@@ -21,12 +21,32 @@ To install, add this to your `Gemfile`:
 Basic atomic counter. Used as an underlying metric for many of the other
 more advanced metrics.
 
+
+#### `increment(incr = 1)`
+
+Increment the counter. Without an argument it will increment by `1`.
+
 ``` ruby
   counter = Metriks.counter('calls')
   counter.increment
-
-  puts "calls: #{counter.count}"
 ```
+
+#### `decrement(decr = 1)`
+
+Decrement the counter. Without an argument it will decrement by `1`.
+
+``` ruby
+  counter = Metriks.counter('calls')
+  counter.decrement
+```
+
+#### `count()`
+
+Return the current value of the counter.
+
+``` ruby
+  counter = Metriks.counter('calls')
+  puts "counter: #{counter.count}"
 
 
 ### Meters
@@ -34,13 +54,41 @@ more advanced metrics.
 A meter that measures the mean throughput and the one-, five-, and
 fifteen-minute exponentially-weighted moving average throughputs.
 
+#### `mark(val = 1)`
+
+Record an event with the meter. Without an argument it will record one event.
+
 ``` ruby
   meter = Metriks.meter('requests')
   meter.mark
-
-  puts "requests: #{meter.one_minute_rate}"
 ```
 
+#### `one_minute_rate()`
+
+Returns the one-minute average rate.
+
+``` ruby
+  meter = Metriks.meter('requests')
+  puts "rate: #{meter.one_minute_rater}/sec"
+```
+
+#### `five_minute_rate()`
+
+Returns the five-minute average rate.
+
+``` ruby
+  meter = Metriks.meter('requests')
+  puts "rate: #{meter.five_minute_rater}/sec"
+```
+
+#### `fifteen_minute_rate()`
+
+Returns the fifteen-minute average rate.
+
+``` ruby
+  meter = Metriks.meter('requests')
+  puts "rate: #{meter.fifteen_minute_rater}/sec"
+```
 
 ### Timers
 
