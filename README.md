@@ -69,7 +69,7 @@ Returns the total number of events that have been recorded.
 
 ``` ruby
   meter = Metriks.meter('requests')
-  puts "total: #{meter.total}"
+  puts "total: #{meter.count}"
 ```
 
 ### one_minute_rate()
