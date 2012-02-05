@@ -4,7 +4,7 @@ This is an experiment in making a threadsafe, low impact library to measure
 aspects of your ruby.
 
 
-## Installing
+# Installing
 
 Everything is still in flux, so for the time being I have been installing
 the gem from git with bundler.
@@ -14,15 +14,15 @@ To install, add this to your `Gemfile`:
     gem 'metriks', :git => 'git://github.com/eric/metriks.git'
 
 
-## Metric Overview
+# Metric Overview
 
-### Counters
+## Counters
 
 Basic atomic counter. Used as an underlying metric for many of the other
 more advanced metrics.
 
 
-#### increment(incr = 1)
+### increment(incr = 1)
 
 Increment the counter. Without an argument it will increment by `1`.
 
@@ -31,7 +31,7 @@ Increment the counter. Without an argument it will increment by `1`.
   counter.increment
 ```
 
-#### decrement(decr = 1)
+### decrement(decr = 1)
 
 Decrement the counter. Without an argument it will decrement by `1`.
 
@@ -49,12 +49,12 @@ Return the current value of the counter.
   puts "counter: #{counter.count}"
 ```
 
-### Meters
+## Meters
 
 A meter that measures the mean throughput and the one-, five-, and
 fifteen-minute exponentially-weighted moving average throughputs.
 
-#### mark(val = 1)
+### mark(val = 1)
 
 Record an event with the meter. Without an argument it will record one event.
 
@@ -63,7 +63,7 @@ Record an event with the meter. Without an argument it will record one event.
   meter.mark
 ```
 
-#### one_minute_rate()
+### one_minute_rate()
 
 Returns the one-minute average rate.
 
@@ -72,7 +72,7 @@ Returns the one-minute average rate.
   puts "rate: #{meter.one_minute_rater}/sec"
 ```
 
-#### five_minute_rate()
+### five_minute_rate()
 
 Returns the five-minute average rate.
 
@@ -81,7 +81,7 @@ Returns the five-minute average rate.
   puts "rate: #{meter.five_minute_rater}/sec"
 ```
 
-#### fifteen_minute_rate()
+### fifteen_minute_rate()
 
 Returns the fifteen-minute average rate.
 
@@ -90,7 +90,7 @@ Returns the fifteen-minute average rate.
   puts "rate: #{meter.fifteen_minute_rater}/sec"
 ```
 
-### Timers
+## Timers
 
 A timer that measures the average time as well as throughput metrics via
 a meter.
@@ -110,7 +110,7 @@ a meter.
 ```
 
 
-### Utilization Timer
+## Utilization Timer
 
 A specialized timer that calculates the percentage (between 0 and 1) of
 wall-clock time that was spent.
@@ -129,9 +129,9 @@ wall-clock time that was spent.
   puts "utilization: #{timer.one_minute_rate * 100.0}%"
 ```
 
-## Reporter Overview
+# Reporter Overview
 
-### Proc Title Reporter
+## Proc Title Reporter
 
 Provides a simple way to get up-to-date statistics from a process by
 updating the proctitle every 5 seconds (default).
@@ -154,7 +154,7 @@ will display:
 ```
 
 
-## Plans
+# Plans
 
 An incomplete list of things I would like to see added:
 
@@ -167,14 +167,14 @@ An incomplete list of things I would like to see added:
 * Metaprogramming instrumentation hooks like [Shopify's statsd-instrument](https://github.com/Shopify/statsd-instrument)
 
 
-## Credits
+# Credits
 
 Most of the inspiration for this project comes from the amazing talk that
 Code Hale gave at CodeConf and his sweet
 [Metrics](https://github.com/codahale/metrics) Java library.
 
 
-## License
+# License
 
 Copyright (c) 2012 Eric Lindvall
 
