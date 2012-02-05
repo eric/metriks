@@ -78,7 +78,7 @@ Returns the one-minute average rate.
 
 ``` ruby
   meter = Metriks.meter('requests')
-  puts "rate: #{meter.one_minute_rater}/sec"
+  puts "rate: #{meter.one_minute_rate}/sec"
 ```
 
 ### five_minute_rate()
@@ -87,7 +87,7 @@ Returns the five-minute average rate.
 
 ``` ruby
   meter = Metriks.meter('requests')
-  puts "rate: #{meter.five_minute_rater}/sec"
+  puts "rate: #{meter.five_minute_rate}/sec"
 ```
 
 ### fifteen_minute_rate()
@@ -96,7 +96,7 @@ Returns the fifteen-minute average rate.
 
 ``` ruby
   meter = Metriks.meter('requests')
-  puts "rate: #{meter.fifteen_minute_rater}/sec"
+  puts "rate: #{meter.fifteen_minute_rate}/sec"
 ```
 
 ### mean_rate()
@@ -163,7 +163,7 @@ Returns the one-minute average rate.
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "rate: #{meter.one_minute_rater}/sec"
+  puts "rate: #{meter.one_minute_rate}/sec"
 ```
 
 ### five_minute_rate()
@@ -172,7 +172,7 @@ Returns the five-minute average rate.
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "rate: #{meter.five_minute_rater}/sec"
+  puts "rate: #{meter.five_minute_rate}/sec"
 ```
 
 ### fifteen_minute_rate()
@@ -181,7 +181,7 @@ Returns the fifteen-minute average rate.
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "rate: #{meter.fifteen_minute_rater}/sec"
+  puts "rate: #{meter.fifteen_minute_rate}/sec"
 ```
 
 ### mean_rate()
@@ -242,7 +242,7 @@ Returns the one-minute average utilization as a percentage between `0.0` and `1.
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "utilization: #{meter.one_minute_rater * 100}%"
+  puts "utilization: #{meter.one_minute_rate * 100}%"
 ```
 
 ### five_minute_utilization()
@@ -251,7 +251,7 @@ Returns the five-minute average utilization as a percentage between `0.0` and `1
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "utilization: #{meter.five_minute_rater * 100}%"
+  puts "utilization: #{meter.five_minute_rate * 100}%"
 ```
 
 ### fifteen_minute_utilization()
@@ -260,7 +260,7 @@ Returns the fifteen-minute average utilization as a percentage between `0.0` and
 
 ``` ruby
   meter = Metriks.timer('requests')
-  puts "utilization: #{meter.fifteen_minute_rater * 100}%"
+  puts "utilization: #{meter.fifteen_minute_rate * 100}%"
 ```
 
 ### mean_utilization()
