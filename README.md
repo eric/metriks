@@ -232,13 +232,13 @@ Returns the standard deviation of the mean spent in the operation.
 
 ## Utilization Timer
 
-A specialized `Timer` that calculates the percentage (between 0 and 1) of
+A specialized `Timer` that calculates the percentage (between `0.0` and `1.0`) of
 wall-clock time that was spent. It includes all of the methods of `Timer`.
 
 
 ### one_minute_utilization()
 
-Returns the one-minute average utilization as a percentage between 0.0 and 1.0.
+Returns the one-minute average utilization as a percentage between `0.0` and `1.0`.
 
 ``` ruby
   meter = Metriks.timer('requests')
@@ -247,7 +247,7 @@ Returns the one-minute average utilization as a percentage between 0.0 and 1.0.
 
 ### five_minute_utilization()
 
-Returns the five-minute average utilization as a percentage between 0.0 and 1.0.
+Returns the five-minute average utilization as a percentage between `0.0` and `1.0`.
 
 ``` ruby
   meter = Metriks.timer('requests')
@@ -256,7 +256,7 @@ Returns the five-minute average utilization as a percentage between 0.0 and 1.0.
 
 ### fifteen_minute_utilization()
 
-Returns the fifteen-minute average utilization as a percentage between 0.0 and 1.0.
+Returns the fifteen-minute average utilization as a percentage between `0.0` and `1.0`.
 
 ``` ruby
   meter = Metriks.timer('requests')
@@ -265,7 +265,7 @@ Returns the fifteen-minute average utilization as a percentage between 0.0 and 1
 
 ### mean_utilization()
 
-Returns the mean (average) utilization as a percentage between 0.0 and 1.0
+Returns the mean (average) utilization as a percentage between `0.0` and `1.0`
 since the process started.
 
 ``` ruby
