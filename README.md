@@ -63,6 +63,15 @@ Record an event with the meter. Without an argument it will record one event.
   meter.mark
 ```
 
+### count()
+
+Returns the total number of events that have been recorded.
+
+``` ruby
+  meter = Metriks.meter('requests')
+  puts "total: #{meter.total}"
+```
+
 ### one_minute_rate()
 
 Returns the one-minute average rate.
@@ -90,44 +99,180 @@ Returns the fifteen-minute average rate.
   puts "rate: #{meter.fifteen_minute_rater}/sec"
 ```
 
+### mean_rate()
+
+Returns the mean (average) rate of the events since the start of the process.
+
+``` ruby
+  meter = Metriks.meter('requests')
+  puts "rate: #{meter.mean_rate}/sec"
+```
+
 ## Timers
 
 A timer that measures the average time as well as throughput metrics via
 a meter.
+
+### update(duration)
+
+Records the duration of an operation. This normally wouldn't need to be
+called — the `#time` method is provided to simplify recording a duration.
+
+``` ruby
+  timer = Metriks.timer('requests')
+  t0 = Time.now
+  work
+  timer.update(Time.now - t0)
+```
+
+### time(callable = nil, &block)
+
+Measure the amount of time a proc takes to execute. Takes either a block
+or an object responding to `#call` (normally a `proc` or `lambda`).
 
 ``` ruby
   timer = Metriks.timer('requests')
   timer.time do
     work
   end
+```
 
+If neither a block or an object is passed to the method, an object that
+responds to `#stop` will be returned. When `#stop` is called, the time
+will be recorded.
+
+``` ruby
+  timer = Metriks.timer('requests')
   t = timer.time
   work
   t.stop
+```
 
-  puts "average request time: #{timer.mean}"
-  puts "rate: #{timer.five_minute_rate}/sec"
+### count()
+
+Returns the number of measurements that have been made.
+
+``` ruby
+  timer = Metriks.timer('requests')
+  puts "calls: #{timer.count}"
+```
+
+### one_minute_rate()
+
+Returns the one-minute average rate.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "rate: #{meter.one_minute_rater}/sec"
+```
+
+### five_minute_rate()
+
+Returns the five-minute average rate.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "rate: #{meter.five_minute_rater}/sec"
+```
+
+### fifteen_minute_rate()
+
+Returns the fifteen-minute average rate.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "rate: #{meter.fifteen_minute_rater}/sec"
+```
+
+### mean_rate()
+
+Returns the mean (average) rate of the events since the start of the process.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "rate: #{meter.mean_rate}/sec"
+```
+
+### min()
+
+Returns the minimum amount of time spent in the operation.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "time: #{meter.min} seconds"
+```
+
+### max()
+
+Returns the maximum time spent in the operation.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "time: #{meter.max} seconds"
+```
+
+### mean()
+
+Returns the mean (average) time spent in the operation.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "time: #{meter.mean} seconds"
+```
+
+### stddev()
+
+Returns the standard deviation of the mean spent in the operation.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "time: #{meter.stddev} seconds"
 ```
 
 
 ## Utilization Timer
 
-A specialized timer that calculates the percentage (between 0 and 1) of
-wall-clock time that was spent.
+A specialized `Timer` that calculates the percentage (between 0 and 1) of
+wall-clock time that was spent. It includes all of the methods of `Timer`.
+
+
+### one_minute_utilization()
+
+Returns the one-minute average utilization as a percentage between 0.0 and 1.0.
 
 ``` ruby
-  timer = Metriks.utilization_timer('requests')
-  timer.time do
-    work
-  end
-
-  t = timer.time
-  work
-  t.stop
-
-  puts "average request time: #{timer.mean}"
-  puts "utilization: #{timer.one_minute_rate * 100.0}%"
+  meter = Metriks.timer('requests')
+  puts "utilization: #{meter.one_minute_rater * 100}%"
 ```
+
+### five_minute_utilization()
+
+Returns the five-minute average utilization as a percentage between 0.0 and 1.0.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "utilization: #{meter.five_minute_rater * 100}%"
+```
+
+### fifteen_minute_utilization()
+
+Returns the fifteen-minute average utilization as a percentage between 0.0 and 1.0.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "utilization: #{meter.fifteen_minute_rater * 100}%"
+```
+
+### fifteen_minute_utilization()
+
+Returns the mean (average) utilization as a percentage between 0.0 and 1.0
+since the process started.
+
+``` ruby
+  meter = Metriks.timer('requests')
+  puts "utilization: #{meter.mean_utilization * 100}%"
+```
+
 
 # Reporter Overview
 

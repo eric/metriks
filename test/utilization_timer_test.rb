@@ -18,6 +18,7 @@ class UtilizationTimerTest < Test::Unit::TestCase
     end
 
     @timer.instance_variable_get(:@meter).tick
+    @timer.instance_variable_get(:@duration_meter).tick
 
     assert_in_delta 0.25, @timer.one_minute_utilization, 0.1
   end
