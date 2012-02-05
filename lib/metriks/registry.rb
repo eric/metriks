@@ -4,16 +4,25 @@ require 'metriks/utilization_timer'
 require 'metriks/meter'
 
 module Metriks
+  # Public: A collection of metrics
   class Registry
+    # Public: The default registry for the process.
+    #
+    # Returns the default Registry for the process.
     def self.default
       @default ||= new
     end
 
+    # Public: Initializes a new Registry.
     def initialize
       @mutex = Mutex.new
       @metrics = {}
     end
 
+    # Public: Clear all of the metrics in the Registry. This ensures all
+    # metrics that have been added are stopped.
+    #
+    # Returns nothing.
     def clear
       @mutex.synchronize do
         @metrics.each do |key, metric|
@@ -24,32 +33,102 @@ module Metriks
       end
     end
 
+    # Public: Clear all of the metrics in the Registry. This has the same
+    # effect as calling #clear.
+    #
+    # Returns nothing.
     def stop
       clear
     end
 
+    # Public: Fetch or create a new counter metric. Counters are one of the
+    # simplest metrics whose only operations are increment and decrement.
+    #
+    # name - The String name of the metric to define or fetch
+    #
+    # Examples
+    #
+    #   registry.counter('method.calls')
+    #
+    # Returns the Metricks::Counter identified by the name.
     def counter(name)
       add_or_get(name, Metriks::Counter)
     end
 
-    def timer(name)
-      add_or_get(name, Metriks::Timer)
-    end
-
-    def utilization_timer(name)
-      add_or_get(name, Metriks::UtilizationTimer)
-    end
-
+    # Public: Fetch or create a new meter metric. Meters are a counter that
+    # tracks throughput along with the count.
+    #
+    # name - The String name of the metric to define or fetch
+    #
+    # Examples
+    #
+    #   registry.meter('resque.calls')
+    #
+    # Returns the Metricks::Meter identified by the name.
     def meter(name)
       add_or_get(name, Metriks::Meter)
     end
 
+    # Public: Fetch or create a new timer metric. Timers provide the means to
+    # time the execution of a method including statistics on the number of
+    # invocations, average length of time, throughput.
+    #
+    # name - The String name of the metric to define or fetch
+    #
+    # Examples
+    #
+    #   registry.timer('resque.worker')
+    #
+    # Returns the Metricks::Timer identified by the name.
+    def timer(name)
+      add_or_get(name, Metriks::Timer)
+    end
+
+    # Public: Fetch or create a new utilization timer metric.
+    #
+    # Utilization timers are a specialized version of a timer that calculate
+    # the percentage of wall-clock time (between 0 and 1) that was spent in
+    # the method. This metric is most valuable in a single-threaded
+    # environment where a processes is waiting on an external resource like a
+    # message queue or HTTP server.
+    #
+    # name - The String name of the metric to define or fetch
+    #
+    # Examples
+    #
+    #   registry.utilization_timer('rack.utilization')
+    #
+    # Returns the Metricks::UtilizationTimer identified by the name.
+    def utilization_timer(name)
+      add_or_get(name, Metriks::UtilizationTimer)
+    end
+
+    # Public: Fetch an existing metric.
+    #
+    # name - The String name of the metric to fetch
+    #
+    # Examples
+    #
+    #   registry.get('rack.utilization')
+    #
+    # Returns the metric or nil.
     def get(name)
       @mutex.synchronize do
         @metrics[name]
       end
     end
 
+    # Public: Add a new metric.
+    #
+    # name - The String name of the metric to add
+    # metric - The metric instance to add
+    #
+    # Examples
+    #
+    #   registry.add('method.calls', Metriks::Counter.new)
+    #
+    # Returns nothing.
+    # Raises RuntimeError if the metric name is already defined
     def add(name, metric)
       @mutex.synchronize do
         if @metrics[name]
