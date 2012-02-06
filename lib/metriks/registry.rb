@@ -41,6 +41,23 @@ module Metriks
       clear
     end
 
+    # Public: Iterate over all of the counters.
+    #
+    # Examples
+    #
+    #   registry.each do |name, metric|
+    #     puts name
+    #   end
+    #
+    # Returns nothing.
+    def each(&block)
+      metrics = @mutex.synchronize do
+        @metrics.dup
+      end
+
+      metrics.each(&block)
+    end
+
     # Public: Fetch or create a new counter metric. Counters are one of the
     # simplest metrics whose only operations are increment and decrement.
     #
