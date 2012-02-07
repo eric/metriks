@@ -1,4 +1,5 @@
 require 'atomic'
+require 'hitimes'
 
 require 'metriks/meter'
 require 'metriks/histogram'
@@ -6,13 +7,15 @@ require 'metriks/histogram'
 module Metriks
   class Timer
     class Context
-      def initialize(timer, start_time)
-        @timer      = timer
-        @start_time = start_time
+      def initialize(timer)
+        @timer    = timer
+        @interval = Hitimes::Interval.new
+        @interval.start
       end
 
       def stop
-        @timer.update(Time.now - @start_time)
+        @interval.stop
+        @timer.update(@interval.duration)
       end
     end
 
@@ -35,16 +38,16 @@ module Metriks
 
     def time(callable = nil, &block)
       callable ||= block
-      start_time = Time.now
+      context = Context.new(self)
 
       if callable.nil?
-        return Context.new(self, start_time)
+        return context
       end
 
       begin
         return callable.call
       ensure
-        update(Time.now - start_time)
+        context.stop
       end
     end
 
