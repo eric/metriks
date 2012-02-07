@@ -9,8 +9,7 @@ module Metriks
     class Context
       def initialize(timer)
         @timer    = timer
-        @interval = Hitimes::Interval.new
-        @interval.start
+        @interval = Hitimes::Interval.now
       end
 
       def stop
