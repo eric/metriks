@@ -247,7 +247,7 @@ wall-clock time that was spent. It includes all of the methods of `Timer`.
 Returns the one-minute average utilization as a percentage between `0.0` and `1.0`.
 
 ``` ruby
-  meter = Metriks.timer('requests')
+  meter = Metriks.utilization_timer('requests')
   puts "utilization: #{meter.one_minute_utilization * 100}%"
 ```
 
@@ -256,7 +256,7 @@ Returns the one-minute average utilization as a percentage between `0.0` and `1.
 Returns the five-minute average utilization as a percentage between `0.0` and `1.0`.
 
 ``` ruby
-  meter = Metriks.timer('requests')
+  meter = Metriks.utilization_timer('requests')
   puts "utilization: #{meter.five_minute_utilization * 100}%"
 ```
 
@@ -265,7 +265,7 @@ Returns the five-minute average utilization as a percentage between `0.0` and `1
 Returns the fifteen-minute average utilization as a percentage between `0.0` and `1.0`.
 
 ``` ruby
-  meter = Metriks.timer('requests')
+  meter = Metriks.utilization_timer('requests')
   puts "utilization: #{meter.fifteen_minute_utilization * 100}%"
 ```
 
@@ -275,7 +275,7 @@ Returns the mean (average) utilization as a percentage between `0.0` and `1.0`
 since the process started.
 
 ``` ruby
-  meter = Metriks.timer('requests')
+  meter = Metriks.utilization_timer('requests')
   puts "utilization: #{meter.mean_utilization * 100}%"
 ```
 
