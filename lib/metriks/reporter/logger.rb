@@ -14,6 +14,8 @@ module Metriks::Reporter
     def start
       @thread ||= Thread.new do
         loop do
+          sleep @interval
+
           Thread.new do
             begin
               write
@@ -21,8 +23,6 @@ module Metriks::Reporter
               @on_error[ex] rescue nil
             end
           end
-
-          sleep @interval
         end
       end
     end
