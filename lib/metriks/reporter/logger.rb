@@ -2,13 +2,13 @@ require 'logger'
 
 module Metriks::Reporter
   class Logger
-    def initialize(registry, logger, interval, options = {})
-      @registry  = registry
-      @logger    = logger
+    def initialize(options = {})
+      @registry  = options[:registry]  || Metriks::Registry.default
+      @logger    = options[:logger]    || Logger.new(STDOUT)
       @log_level = options[:log_level] || ::Logger::INFO
-      @prefix    = options[:prefix]
-      @interval  = interval
-      @on_errror = options[:on_error] || proc { |ex| }
+      @prefix    = options[:prefix]    || 'metriks:'
+      @interval  = options[:interval]  || 60
+      @on_errror = options[:on_error]  || proc { |ex| }
     end
 
     def start

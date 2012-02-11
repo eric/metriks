@@ -9,7 +9,7 @@ class LoggerReporterTest < Test::Unit::TestCase
     @logger   = ::Logger.new(@stringio)
     @registry = Metriks::Registry.new
 
-    @reporter = Metriks::Reporter::Logger.new(@registry, @logger, 60)
+    @reporter = Metriks::Reporter::Logger.new(:registry => @registry, :logger => @logger)
   end
 
   def teardown
