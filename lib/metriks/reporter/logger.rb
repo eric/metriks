@@ -44,12 +44,6 @@ module Metriks::Reporter
           log_metric name, 'counter', metric, [
             :count
           ]
-        when Metriks::Timer
-          log_metric name, 'timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ]
         when Metriks::UtilizationTimer
           log_metric name, 'utilization_timer', metric, [
             :count, :one_minute_rate, :five_minute_rate,
@@ -57,6 +51,12 @@ module Metriks::Reporter
             :min, :max, :mean, :stddev,
             :one_minute_utilization, :five_minute_utilization,
             :fifteen_minute_utilization, :mean_utilization,
+          ]
+        when Metriks::Timer
+          log_metric name, 'timer', metric, [
+            :count, :one_minute_rate, :five_minute_rate,
+            :fifteen_minute_rate, :mean_rate,
+            :min, :max, :mean, :stddev
           ]
         end
       end
