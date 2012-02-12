@@ -86,7 +86,6 @@ module Metriks::Reporter
         case arg
         when Hash then arg.map { |name, value| "#{name}=#{format_message([value])}" }
         when Array then format_message(arg)
-        when Float then "%0.2f" % arg
         else arg
         end
       end.join(' ')
