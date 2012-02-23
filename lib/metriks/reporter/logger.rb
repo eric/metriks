@@ -4,7 +4,7 @@ module Metriks::Reporter
   class Logger
     def initialize(options = {})
       @registry  = options[:registry]  || Metriks::Registry.default
-      @logger    = options[:logger]    || Logger.new(STDOUT)
+      @logger    = options[:logger]    || ::Logger.new(STDOUT)
       @log_level = options[:log_level] || ::Logger::INFO
       @prefix    = options[:prefix]    || 'metriks:'
       @interval  = options[:interval]  || 60
