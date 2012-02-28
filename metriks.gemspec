@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'metriks'
-  s.version           = '0.8.0'
-  s.date              = '2010-01-01'
+  s.version           = '0.8.1'
+  s.date              = '2012-02-27'
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
@@ -53,7 +53,35 @@ Gem::Specification.new do |s|
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
   ## THE MANIFEST COMMENTS, they are used as delimiters by the task.
   # = MANIFEST =
-  s.files = %w[]
+  s.files = %w[
+    Gemfile
+    LICENSE
+    README.md
+    Rakefile
+    lib/metriks.rb
+    lib/metriks/counter.rb
+    lib/metriks/ewma.rb
+    lib/metriks/histogram.rb
+    lib/metriks/meter.rb
+    lib/metriks/registry.rb
+    lib/metriks/reporter/logger.rb
+    lib/metriks/reporter/proc_title.rb
+    lib/metriks/simple_moving_average.rb
+    lib/metriks/timer.rb
+    lib/metriks/uniform_sample.rb
+    lib/metriks/utilization_timer.rb
+    metriks.gemspec
+    test/counter_test.rb
+    test/histogram_test.rb
+    test/logger_reporter_test.rb
+    test/meter_test.rb
+    test/metriks_test.rb
+    test/proc_title_reporter_test.rb
+    test/registry_test.rb
+    test/test_helper.rb
+    test/timer_test.rb
+    test/utilization_timer_test.rb
+  ]
   # = MANIFEST =
 
   ## Test files will be grabbed from the file list. Make sure the path glob
