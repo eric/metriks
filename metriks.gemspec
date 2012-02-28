@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'metriks'
-  s.version           = '0.8.1'
+  s.version           = '0.8.2'
   s.date              = '2012-02-27'
 
   ## Make sure your summary is short. The description may be as long
@@ -59,15 +59,18 @@ Gem::Specification.new do |s|
     LICENSE
     README.md
     Rakefile
+    benchmark/samplers.rb
     lib/metriks.rb
     lib/metriks/counter.rb
     lib/metriks/ewma.rb
+    lib/metriks/exponentially_decaying_sample.rb
     lib/metriks/histogram.rb
     lib/metriks/meter.rb
     lib/metriks/registry.rb
     lib/metriks/reporter/logger.rb
     lib/metriks/reporter/proc_title.rb
     lib/metriks/simple_moving_average.rb
+    lib/metriks/snapshot.rb
     lib/metriks/timer.rb
     lib/metriks/uniform_sample.rb
     lib/metriks/utilization_timer.rb
