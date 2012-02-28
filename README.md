@@ -9,13 +9,12 @@ I find needs while developing [Papertrail](https://papertrailapp.com/).
 
 # Installing
 
-Everything is still in flux, so for the time being I have been installing
-the gem from git with bundler. If I get a request, I can definitely start
-releasing a gem.
+The API is still in flux, but you can add this to your project by installing
+the gem.
 
 To install, add this to your `Gemfile`:
 
-    gem 'metriks', :git => 'git://github.com/eric/metriks.git'
+    gem 'metriks'
 
 and re-run `bundle`.
 
