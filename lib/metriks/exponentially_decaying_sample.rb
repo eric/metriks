@@ -38,7 +38,7 @@ module Metriks
 
     def update(value, timestamp = Time.now)
       @mutex.synchronize do
-        priority = Math.exp(timestamp - @start_time) / rand
+        priority = weight(timestamp - @start_time) / rand
         new_count = @count.update { |v| v + 1 }
         if new_count <= @reservoir_size
           @values[priority] = value
@@ -61,6 +61,10 @@ module Metriks
       if now >= next_time
         rescale(now, next_time)
       end
+    end
+
+    def weight(time)
+      Math.exp(@alpha * time)
     end
 
     def rescale(now, next_time)
