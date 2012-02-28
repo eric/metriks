@@ -18,7 +18,7 @@ module Metriks
       end
     end
 
-    def initialize(histogram = Metriks::Histogram.new_uniform)
+    def initialize(histogram = Metriks::Histogram.new_exponentially_decaying)
       @meter     = Metriks::Meter.new
       @histogram = histogram
     end
