@@ -18,9 +18,9 @@ module Metriks
       end
     end
 
-    def initialize
+    def initialize(histogram = Metriks::Histogram.new_exponentially_decaying)
       @meter     = Metriks::Meter.new
-      @histogram = Metriks::Histogram.new_uniform
+      @histogram = histogram
     end
 
     def clear
@@ -48,6 +48,10 @@ module Metriks
       ensure
         context.stop
       end
+    end
+
+    def snapshot
+      @histogram.snapshot
     end
 
     def count

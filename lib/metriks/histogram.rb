@@ -1,5 +1,6 @@
 require 'atomic'
 require 'metriks/uniform_sample'
+require 'metriks/exponentially_decaying_sample'
 
 module Metriks
   class Histogram
@@ -8,6 +9,10 @@ module Metriks
 
     def self.new_uniform
       new(Metriks::UniformSample.new(DEFAULT_SAMPLE_SIZE))
+    end
+
+    def self.new_exponentially_decaying
+      new(Metriks::ExponentiallyDecayingSample.new(DEFAULT_SAMPLE_SIZE, DEFAULT_ALPHA))
     end
 
     def initialize(sample)
@@ -35,6 +40,10 @@ module Metriks
       self.min = value
       @sum.update { |v| v + value }
       update_variance(value)
+    end
+
+    def snapshot
+      @sample.snapshot
     end
 
     def count
