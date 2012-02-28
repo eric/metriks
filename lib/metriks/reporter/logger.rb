@@ -51,12 +51,16 @@ module Metriks::Reporter
             :min, :max, :mean, :stddev,
             :one_minute_utilization, :five_minute_utilization,
             :fifteen_minute_utilization, :mean_utilization,
+          ], [
+            :median, :get_95th_percentile
           ]
         when Metriks::Timer
           log_metric name, 'timer', metric, [
             :count, :one_minute_rate, :five_minute_rate,
             :fifteen_minute_rate, :mean_rate,
             :min, :max, :mean, :stddev
+          ], [
+            :median, :get_95th_percentile
           ]
         end
       end
@@ -64,11 +68,12 @@ module Metriks::Reporter
 
     def extract_from_metric(metric, *keys)
       keys.flatten.collect do |key|
-        [ { key => metric.send(key) } ]
+        name = key.to_s.gsub(/^get_/, '')
+        [ { name => metric.send(key) } ]
       end
     end
 
-    def log_metric(name, type, metric, *keys)
+    def log_metric(name, type, metric, keys, snapshot_keys = [])
       message = []
 
       message << @prefix if @prefix
@@ -77,6 +82,11 @@ module Metriks::Reporter
       message << { :name => name }
       message << { :type => type }
       message += extract_from_metric(metric, keys)
+
+      unless snapshot_keys.empty?
+        snapshot = metric.snapshot
+        message += extract_from_metric(snapshot, snapshot_keys)
+      end
 
       @logger.add(@log_level, format_message(message))
     end

@@ -26,5 +26,6 @@ class LoggerReporterTest < Test::Unit::TestCase
     @reporter.write
 
     assert_match /time=\d/, @stringio.string
+    assert_match /median=\d/, @stringio.string
   end
 end

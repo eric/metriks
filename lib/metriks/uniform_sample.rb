@@ -1,4 +1,5 @@
 require 'atomic'
+require 'metriks/snapshot'
 
 module Metriks
   class UniformSample
@@ -17,6 +18,10 @@ module Metriks
     def size
       count = @count.value
       count > @values.length ? @values.length : count
+    end
+
+    def snapshot
+      Snapshot.new(@values.slice(0, size))
     end
 
     def update(value)
