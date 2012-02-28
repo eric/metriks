@@ -46,13 +46,13 @@ class HistogramTest < Test::Unit::TestCase
   def test_uniform_sample_snashot
     @histogram = Metriks::Histogram.new(Metriks::UniformSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE))
 
-    50.times do |idx|
+    100.times do |idx|
       @histogram.update(idx)
     end
 
     snapshot = @histogram.snapshot
 
-    assert_equal 25.5, snapshot.median
+    assert_equal 49.5, snapshot.median
   end
 
   def test_exponential_sample_min
@@ -95,13 +95,13 @@ class HistogramTest < Test::Unit::TestCase
   def test_exponential_sample_snashot
     @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
 
-    50.times do |idx|
+    100.times do |idx|
       @histogram.update(idx)
     end
 
     snapshot = @histogram.snapshot
 
-    assert_equal 25.5, snapshot.median
+    assert_equal 49.5, snapshot.median
   end
 
 end

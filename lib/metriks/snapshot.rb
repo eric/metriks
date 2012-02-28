@@ -7,6 +7,8 @@ class Snapshot
   P99_Q = 0.99
   P999_Q = 0.999
 
+  attr_reader :values
+
   def initialize(values)
     @values = values.sort
   end
@@ -23,7 +25,7 @@ class Snapshot
 
     lower = @values[pos.to_i - 1]
     upper = @values[pos.to_i]
-    lower + (pos - pos.floor) + (upper - lower)
+    lower + (pos - pos.floor) * (upper - lower)
   end
 
   def size

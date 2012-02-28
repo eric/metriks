@@ -12,11 +12,14 @@ class TimerTest < Test::Unit::TestCase
   end
 
   def test_timer
-    @timer.time do
-      sleep 0.1
+    3.times do
+      @timer.time do
+        sleep 0.1
+      end
     end
 
     assert_in_delta 0.1, @timer.mean, 0.01
+    assert_in_delta 0.1, @timer.snapshot.median, 0.01
   end
 
   def test_timer_without_block
