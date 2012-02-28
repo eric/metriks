@@ -75,7 +75,7 @@ module Metriks
           keys = @values.keys
           keys.each do |key|
             value = @values.delete(key)
-            @values[key* Math.exp(-@alpha * (@start_time - old_start_time))] = value
+            @values[key * Math.exp(-@alpha * (@start_time - old_start_time))] = value
           end
         end
       end
