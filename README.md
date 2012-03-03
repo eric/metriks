@@ -283,6 +283,36 @@ since the process started.
 
 How to get metrics out of the process.
 
+## Graphite Reporter
+
+Sends metrics to Graphite every 60 seconds.
+
+```ruby
+  reporter = Metriks::Reporter::Graphite.new 'localhost', 3004
+  reporter.start
+```
+
+
+## Logger Reporter
+
+Send metrics to a logger every 60 seconds.
+
+```
+  reporter = Metriks::Reporter::Logger.new(:logger => Logger.new('log/metrics.log'))
+  reporter.start
+```
+
+
+## Librato Metrics Reporter
+
+Send metrics to Librato Metrics every 60 seconds.
+
+```
+  reporter = Metriks::Reporter::LibratoMetrics.new('email', 'token')
+  reporter.start
+```
+
+
 ## Proc Title Reporter
 
 Provides a simple way to get up-to-date statistics from a process by
@@ -290,11 +320,9 @@ updating the proctitle every 5 seconds (default).
 
 ```ruby
   reporter = Metriks::Reporter::ProcTitle.new :interval => 5
-
   reporter.add 'reqs', 'sec' do
     Metriks.meter('rack.requests').one_minute_rate
   end
-
   reporter.start
 ```
 
@@ -312,9 +340,7 @@ An incomplete list of things I would like to see added:
 * Rack middleware to measure utilization, throughput and worker time
 * Basic reporters:
   * Rack endpoint returning JSON
-  * Logger reporter to output metrics on a time interval
   * [Statsd](https://github.com/etsy/statsd) reporter
-  * [Librato Metrics](http://metrics.librato.com) reporter
 * Metaprogramming instrumentation hooks like [Shopify's statsd-instrument](https://github.com/Shopify/statsd-instrument)
 
 

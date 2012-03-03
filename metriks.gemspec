@@ -26,14 +26,11 @@ Gem::Specification.new do |s|
   ## a custom homepage, consider using your GitHub URL or the like.
   s.authors  = ["Eric Lindvall"]
   s.email    = 'eric@sevenscale.com'
-  s.homepage = 'https://github.com/eric/metriks_client'
+  s.homepage = 'https://github.com/eric/metriks'
 
   ## This gets added to the $LOAD_PATH so that 'lib/NAME.rb' can be required as
   ## require 'NAME.rb' or'/lib/NAME/file.rb' can be as require 'NAME/file.rb'
   s.require_paths = %w[lib]
-
-  ## If your gem includes any executables, list them here.
-  # s.executables = ["name"]
 
   ## Specify any RDoc options here. You'll want to add your README and
   ## LICENSE files to the extra_rdoc_files list.
@@ -45,10 +42,14 @@ Gem::Specification.new do |s|
   s.add_dependency('atomic', ["~> 1.0"])
   s.add_dependency('hitimes', [ "~> 1.1"])
   s.add_dependency('rbtree', [ "~> 0.3" ])
+  s.add_dependency('faraday', ['~> 0.7.0'])
+  s.add_dependency('faraday_middleware', ['~> 0.8.4'])
+  s.add_dependency('yajl-ruby')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
   s.add_development_dependency('tomdoc', ["~> 0.2"])
+  s.add_development_dependency('mocha', ['~> 0.10'])
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE
