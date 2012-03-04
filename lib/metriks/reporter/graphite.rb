@@ -2,9 +2,11 @@
 module Metriks::Reporter
   class Graphite
     def initialize(host, port, options = {})
-      @host      = host
-      @port      = port
-      @prefix    = options[:prefix]
+      @host = host
+      @port = port
+
+      @prefix = options[:prefix]
+
       @registry  = options[:registry] || Metriks::Registry.default
       @interval  = options[:interval] || 60
       @on_errror = options[:on_error] || proc { |ex| }
@@ -34,6 +36,11 @@ module Metriks::Reporter
     def stop
       @thread.kill if @thread
       @thread = nil
+    end
+
+    def restart
+      stop
+      start
     end
 
     def write

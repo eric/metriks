@@ -1,11 +1,12 @@
 module Metriks::Reporter
   class ProcTitle
     def initialize(options = {})
+      @rounding = options[:rounding] || 1
+      @prefix   = options[:prefix]   || $0.dup
+
       @interval  = options[:interval] || 5
-      @rounding  = options[:rounding] || 1
       @on_errror = options[:on_error] || proc { |ex| }
 
-      @prefix   = $0.dup
       @metrics  = []
     end
 
@@ -38,6 +39,11 @@ module Metriks::Reporter
     def stop
       @thread.kill if @thread
       @thread = nil
+    end
+
+    def restart
+      stop
+      start
     end
 
     protected

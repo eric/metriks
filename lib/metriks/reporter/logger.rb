@@ -3,12 +3,13 @@ require 'logger'
 module Metriks::Reporter
   class Logger
     def initialize(options = {})
-      @registry  = options[:registry]  || Metriks::Registry.default
       @logger    = options[:logger]    || ::Logger.new(STDOUT)
       @log_level = options[:log_level] || ::Logger::INFO
       @prefix    = options[:prefix]    || 'metriks:'
-      @interval  = options[:interval]  || 60
-      @on_errror = options[:on_error]  || proc { |ex| }
+
+      @registry  = options[:registry] || Metriks::Registry.default
+      @interval  = options[:interval] || 60
+      @on_errror = options[:on_error] || proc { |ex| }
     end
 
     def start
@@ -30,6 +31,11 @@ module Metriks::Reporter
     def stop
       @thread.kill if @thread
       @thread = nil
+    end
+
+    def restart
+      stop
+      start
     end
 
     def write

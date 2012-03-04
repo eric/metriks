@@ -19,13 +19,15 @@ module Metriks::Reporter
 
 
     def initialize(email, token, options = {})
-      @email     = email
-      @token     = token
-      @prefix    = options[:prefix]
+      @email = email
+      @token = token
+
+      @prefix = options[:prefix]
+      @source = options[:source]
+
       @registry  = options[:registry] || Metriks::Registry.default
       @interval  = options[:interval] || 60
       @on_errror = options[:on_error] || proc { |ex| }
-      @source    = options[:source]
     end
 
     def start
@@ -47,6 +49,11 @@ module Metriks::Reporter
     def stop
       @thread.kill if @thread
       @thread = nil
+    end
+
+    def restart
+      stop
+      start
     end
 
     def write
