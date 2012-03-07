@@ -42,9 +42,6 @@ Gem::Specification.new do |s|
   s.add_dependency('atomic', ["~> 1.0"])
   s.add_dependency('hitimes', [ "~> 1.1"])
   s.add_dependency('rbtree', [ "~> 0.3" ])
-  s.add_dependency('faraday', ['~> 0.7.0'])
-  s.add_dependency('faraday_middleware', ['~> 0.8.4'])
-  s.add_dependency('yajl-ruby')
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development

@@ -1,23 +1,7 @@
-require 'faraday'
-require 'faraday_middleware'
-require 'yajl'
-require 'yajl/json_gem'
+require 'net/https'
 
 module Metriks::Reporter
   class LibratoMetrics
-    def self.connection
-      @connection ||= Faraday::Connection.new('https://metrics-api.librato.com') do |b|
-        b.use FaradayMiddleware::EncodeJson
-        b.adapter Faraday.default_adapter
-        b.use Faraday::Response::RaiseError
-        b.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/
-      end.tap do |c|
-        c.headers[:content_type] = 'application/json'
-        c.headers[:user_agent] = "Metriks/#{Metriks::VERSION} Faraday/#{Faraday::VERSION}"
-      end
-    end
-
-
     def initialize(email, token, options = {})
       @email = email
       @token = token
@@ -90,19 +74,42 @@ module Metriks::Reporter
         end
       end
 
-      submit(:gauges => gauges.flatten)
+      submit(form_data(gauges.flatten))
     end
 
-    def connection
-      @connection ||= self.class.connection.dup.tap do |c|
-        c.basic_auth @email, @token
+    def submit(data)
+      url = URI.parse('https://metrics-api.librato.com/v1/metrics')
+      req = Net::HTTP::Post.new(url.path)
+      req.basic_auth(@email, @token)
+      req.set_form_data(data)
+
+      http = Net::HTTP.new(url.host, url.port)
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      http.use_ssl = true
+      store = OpenSSL::X509::Store.new
+      store.set_default_paths
+      http.cert_store = store
+
+      case res = http.start { |http| http.request(req) }
+      when Net::HTTPSuccess, Net::HTTPRedirection
+        # OK
+      else
+        res.error!
       end
     end
 
-    def submit(body)
-      connection.post '/v1/metrics' do |req|
-        req.body = body
+    def form_data(gauges)
+      data = {}
+
+      gauges.each_with_index do |gauge, idx|
+        gauge.each do |key, value|
+          if value
+            data["gauges[#{idx}][#{key}]"] = value.to_s
+          end
+        end
       end
+
+      data
     end
 
     def prepare_metric(base_name, metric, keys, snapshot_keys = [])
