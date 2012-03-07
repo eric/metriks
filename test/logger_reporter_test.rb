@@ -10,6 +10,11 @@ class LoggerReporterTest < Test::Unit::TestCase
     @registry = Metriks::Registry.new
 
     @reporter = Metriks::Reporter::Logger.new(:registry => @registry, :logger => @logger)
+
+    @registry.meter('meter.testing').mark
+    @registry.counter('counter.testing').increment
+    @registry.timer('timer.testing').update(1.5)
+    @registry.utilization_timer('utilization_timer.testing').update(1.5)
   end
 
   def teardown
@@ -18,12 +23,14 @@ class LoggerReporterTest < Test::Unit::TestCase
   end
 
   def test_write
-    @registry.meter('meter.testing').mark
-    @registry.counter('counter.testing').increment
-    @registry.timer('timer.testing').update(1.5)
-    @registry.utilization_timer('utilization_timer.testing').update(1.5)
-
     @reporter.write
+
+    assert_match /time=\d/, @stringio.string
+    assert_match /median=\d/, @stringio.string
+  end
+
+  def test_flush
+    @reporter.flush
 
     assert_match /time=\d/, @stringio.string
     assert_match /median=\d/, @stringio.string

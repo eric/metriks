@@ -38,7 +38,15 @@ module Metriks::Reporter
       start
     end
 
+    def flush
+      if !@last_write || @last_write.min != Time.now.min
+        write
+      end
+    end
+
     def write
+      @last_write = Time.now
+
       @registry.each do |name, metric|
         case metric
         when Metriks::Meter
