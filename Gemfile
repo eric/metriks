@@ -8,4 +8,5 @@ end
 
 group :test do
   gem 'turn'
+  gem 'rake', '0.8.7'
 end
