@@ -20,7 +20,7 @@ class MeterTest < Test::Unit::TestCase
   end
 
   def test_meter_threaded
-    thread 10, n: 100 do
+    thread 10, :n => 100 do
       @meter.mark
     end
 

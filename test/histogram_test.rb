@@ -38,7 +38,7 @@ class HistogramTest < Test::Unit::TestCase
   def test_uniform_sample_mean_threaded
     @histogram = Metriks::Histogram.new(Metriks::UniformSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE))
 
-    thread 10, n: 100 do
+    thread 10, :n => 100 do
       @histogram.update(5)
       @histogram.update(10)
     end
@@ -127,7 +127,7 @@ class HistogramTest < Test::Unit::TestCase
   def test_exponential_sample_mean_threaded
     @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
 
-    thread 10, n: 100 do
+    thread 10, :n => 100 do
       @histogram.update(5)
       @histogram.update(10)
     end

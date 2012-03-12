@@ -16,7 +16,7 @@ class CounterTest < Test::Unit::TestCase
   end
 
   def test_increment_threaded
-    thread 10, n: 100 do
+    thread 10, :n => 100 do
       @counter.increment
     end
 
@@ -30,7 +30,7 @@ class CounterTest < Test::Unit::TestCase
   end
   
   def test_increment_by_more_threaded
-    thread 10, n: 100 do
+    thread 10, :n => 100 do
       @counter.increment 10
     end
 
