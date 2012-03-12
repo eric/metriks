@@ -1,4 +1,3 @@
-
 module Metriks::Reporter
   class Graphite
     attr_reader :host, :port
