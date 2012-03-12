@@ -1,4 +1,3 @@
-
 module Metriks::Reporter
   class Graphite
     def initialize(host, port, options = {})
@@ -13,8 +12,8 @@ module Metriks::Reporter
     end
 
     def socket
-      @socket = nil if @socket.closed?
-      @socket ||= TCPSocket.new(host, port)
+      @socket = nil if @socket && @socket.closed?
+      @socket ||= TCPSocket.new(@host, @port)
     end
 
     def start
