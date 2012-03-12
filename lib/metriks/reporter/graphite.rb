@@ -1,6 +1,8 @@
 
 module Metriks::Reporter
   class Graphite
+    attr_reader :host, :port
+
     def initialize(host, port, options = {})
       @host = host
       @port = port
@@ -13,8 +15,8 @@ module Metriks::Reporter
     end
 
     def socket
-      @socket = nil if @socket.closed?
-      @socket ||= TCPSocket.new(host, port)
+      @socket = nil if @socket && @socket.closed?
+      @socket ||= TCPSocket.new(@host, @port)
     end
 
     def start
