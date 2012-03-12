@@ -3,6 +3,8 @@ require 'test_helper'
 require 'metriks/meter'
 
 class MeterTest < Test::Unit::TestCase
+  include ThreadHelper
+
   def setup
     @meter = Metriks::Meter.new
   end
@@ -15,6 +17,14 @@ class MeterTest < Test::Unit::TestCase
     @meter.mark
 
     assert_equal 1, @meter.count
+  end
+
+  def test_meter_threaded
+    thread 10, :n => 100 do
+      @meter.mark
+    end
+
+    assert_equal 1000, @meter.count
   end
 
   def test_one_minute_rate

@@ -3,6 +3,8 @@ require 'test_helper'
 require 'metriks/histogram'
 
 class HistogramTest < Test::Unit::TestCase
+  include ThreadHelper
+
   def setup
   end
 
@@ -33,11 +35,37 @@ class HistogramTest < Test::Unit::TestCase
     assert_equal 7, @histogram.mean
   end
 
+  def test_uniform_sample_mean_threaded
+    @histogram = Metriks::Histogram.new(Metriks::UniformSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE))
+
+    thread 10, :n => 100 do
+      @histogram.update(5)
+      @histogram.update(10)
+    end
+
+    assert_equal 7, @histogram.mean
+  end
+  
   def test_uniform_sample_2000
     @histogram = Metriks::Histogram.new(Metriks::UniformSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE))
 
     2000.times do |idx|
       @histogram.update(idx)
+    end
+
+    assert_equal 1999, @histogram.max
+  end
+  
+  def test_uniform_sample_2000_threaded
+    @histogram = Metriks::Histogram.new(Metriks::UniformSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE))
+
+    t = 10
+    thread t do |i|
+      2000.times do |x|
+        if (x % t) == i
+          @histogram.update x
+        end
+      end
     end
 
     assert_equal 1999, @histogram.max
@@ -55,6 +83,20 @@ class HistogramTest < Test::Unit::TestCase
     assert_equal 49.5, snapshot.median
   end
 
+  def test_uniform_sample_snapshot_threaded
+    @histogram = Metriks::Histogram.new(Metriks::UniformSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE))
+
+    thread 10 do
+      100.times do |idx|
+        @histogram.update(idx)
+      end
+    end
+
+    snapshot = @histogram.snapshot
+
+    assert_equal 49.5, snapshot.median
+  end
+
   def test_exponential_sample_min
     @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
 
@@ -63,7 +105,7 @@ class HistogramTest < Test::Unit::TestCase
 
     assert_equal 5, @histogram.min
   end
-
+  
   def test_exponential_sample_max
     @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
 
@@ -81,12 +123,38 @@ class HistogramTest < Test::Unit::TestCase
 
     assert_equal 7, @histogram.mean
   end
+  
+  def test_exponential_sample_mean_threaded
+    @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
+
+    thread 10, :n => 100 do
+      @histogram.update(5)
+      @histogram.update(10)
+    end
+
+    assert_equal 7, @histogram.mean
+  end
 
   def test_exponential_sample_2000
     @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
 
     2000.times do |idx|
       @histogram.update(idx)
+    end
+
+    assert_equal 1999, @histogram.max
+  end
+  
+  def test_exponential_sample_2000_threaded
+    @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
+
+    t = 10
+    thread t do |i|
+      2000.times do |idx|
+        if (idx % t) == i
+          @histogram.update(idx)
+        end
+      end
     end
 
     assert_equal 1999, @histogram.max
@@ -104,4 +172,17 @@ class HistogramTest < Test::Unit::TestCase
     assert_equal 49.5, snapshot.median
   end
 
+  def test_exponential_sample_snapshot_threaded
+    @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
+
+    thread 10 do
+      100.times do |idx|
+        @histogram.update(idx)
+      end
+    end
+
+    snapshot = @histogram.snapshot
+
+    assert_equal 49.5, snapshot.median
+  end
 end
