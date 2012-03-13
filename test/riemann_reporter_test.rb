@@ -1,5 +1,8 @@
 require 'test_helper'
 
+# riemann only works in 1.9
+if RUBY_VERSION > '1.9'
+
 require 'metriks/reporter/riemann'
 
 class RiemannReporterTest < Test::Unit::TestCase
@@ -61,4 +64,6 @@ class RiemannReporterTest < Test::Unit::TestCase
 
     @reporter.write
   end
+end
+
 end
