@@ -40,6 +40,12 @@ module Metriks
       @mutex.synchronize do
         priority = weight(timestamp - @start_time) / rand
         new_count = @count.update { |v| v + 1 }
+
+        if priority.nan?
+          warn "ExponentiallyDecayingSample found priority of NaN. timestamp: #{timestamp.to_f} start_time: #{@start_time.to_f}"
+          return
+        end
+
         if new_count <= @reservoir_size
           @values[priority] = value
         else
