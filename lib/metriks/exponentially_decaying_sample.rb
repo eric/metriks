@@ -1,13 +1,13 @@
 require 'atomic'
-require 'rbtree'
+require 'red_black_tree'
 require 'metriks/snapshot'
 
 module Metriks
   class ExponentiallyDecayingSample
     RESCALE_THRESHOLD = 60 * 60 # 1 hour
 
-    def initialize(reservoir_size, alpha)
-      @values = RBTree.new
+    def initialize(reservoir_size, alpha, values = nil)
+      @values = values || RedBlackTree.new
       @count = Atomic.new(0)
       @next_scale_time = Atomic.new(0)
       @alpha = alpha
