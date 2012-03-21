@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'thread_error_handling_tests'
 
 # riemann only works in 1.9
 if RUBY_VERSION > '1.9'
@@ -6,14 +7,20 @@ if RUBY_VERSION > '1.9'
 require 'metriks/reporter/riemann'
 
 class RiemannReporterTest < Test::Unit::TestCase
-  def setup
-    @registry = Metriks::Registry.new
-    @reporter = Metriks::Reporter::Riemann.new(
+  include ThreadErrorHandlingTests
+
+  def build_reporter(options={})
+    Metriks::Reporter::Riemann.new({
       :host => "foo",
       :port => 1234,
       :registry => @registry,
       :default_event => {:host => "h"}
-    )
+    }.merge(options))
+  end
+
+  def setup
+    @registry = Metriks::Registry.new
+    @reporter = build_reporter
   end
 
   def teardown

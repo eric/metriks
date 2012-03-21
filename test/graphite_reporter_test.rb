@@ -1,11 +1,18 @@
 require 'test_helper'
+require 'thread_error_handling_tests'
 
 require 'metriks/reporter/graphite'
 
 class GraphiteReporterTest < Test::Unit::TestCase
+  include ThreadErrorHandlingTests
+
+  def build_reporter(options={})
+    Metriks::Reporter::Graphite.new('localhost', 3333, { :registry => @registry }.merge(options))
+  end
+
   def setup
     @registry = Metriks::Registry.new
-    @reporter = Metriks::Reporter::Graphite.new('localhost', 3333, :registry => @registry)
+    @reporter = build_reporter
     @stringio = StringIO.new
 
     @reporter.stubs(:socket).returns(@stringio)
