@@ -5,7 +5,7 @@ module Metriks::Reporter
       @prefix   = options[:prefix]   || $0.dup
 
       @interval  = options[:interval] || 5
-      @on_errror = options[:on_error] || proc { |ex| }
+      @on_error  = options[:on_error] || proc { |ex| }
 
       @metrics  = []
     end
@@ -29,7 +29,7 @@ module Metriks::Reporter
               end
             end
           rescue Exception => ex
-            @on_errror[ex] rescue nil
+            @on_error[ex] rescue nil
           end
           sleep @interval
         end

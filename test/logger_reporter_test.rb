@@ -1,15 +1,22 @@
 require 'test_helper'
+require 'thread_error_handling_tests'
 
 require 'logger'
 require 'metriks/reporter/logger'
 
 class LoggerReporterTest < Test::Unit::TestCase
+  include ThreadErrorHandlingTests
+
+  def build_reporter(options={})
+    Metriks::Reporter::Logger.new({ :registry => @registry, :logger => @logger }.merge(options))
+  end
+
   def setup
     @stringio = StringIO.new
     @logger   = ::Logger.new(@stringio)
     @registry = Metriks::Registry.new
 
-    @reporter = Metriks::Reporter::Logger.new(:registry => @registry, :logger => @logger)
+    @reporter = build_reporter
 
     @registry.meter('meter.testing').mark
     @registry.counter('counter.testing').increment

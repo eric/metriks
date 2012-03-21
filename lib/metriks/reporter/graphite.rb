@@ -11,7 +11,7 @@ module Metriks::Reporter
 
       @registry  = options[:registry] || Metriks::Registry.default
       @interval  = options[:interval] || 60
-      @on_errror = options[:on_error] || proc { |ex| }
+      @on_error  = options[:on_error] || proc { |ex| }
     end
 
     def socket
