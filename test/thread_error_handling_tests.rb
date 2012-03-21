@@ -10,7 +10,7 @@ module ThreadErrorHandlingTests
     reporter.stubs(:write).raises(StandardError, "boom")
 
     reporter.start
-    sleep 0.002
+    sleep 0.02
     assert_equal true, error_handler_called
     assert_equal "boom", rescued_error.message
   ensure
