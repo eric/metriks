@@ -121,7 +121,9 @@ module Metriks::Reporter
 
       def sleep
         sleep_time = next_time - Time.now.to_f
-        Kernel.sleep(sleep_time)
+        if sleep_time > 0
+          Kernel.sleep(sleep_time)
+        end
       end
 
       def next_time
