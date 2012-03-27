@@ -32,12 +32,7 @@ module Metriks
 
     def snapshot
       @mutex.synchronize do
-        # Work around a bug in avl_tree right now -- see Issue #6 for details
-        if @values.empty?
-          Snapshot.new([])
-        else
-          Snapshot.new(@values.values)
-        end
+        Snapshot.new(@values.values)
       end
     end
 
