@@ -1,6 +1,6 @@
 
 module Metriks
-  VERSION = '0.9.7.3'
+  VERSION = '0.9.8'
 
   def self.get(name)
     Metriks::Registry.default.get(name)
