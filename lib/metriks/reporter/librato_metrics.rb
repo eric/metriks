@@ -2,6 +2,8 @@ require 'net/https'
 
 module Metriks::Reporter
   class LibratoMetrics
+    attr_accessor :prefix, :source
+
     def initialize(email, token, options = {})
       @email = email
       @token = token

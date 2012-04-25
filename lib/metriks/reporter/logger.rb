@@ -2,6 +2,8 @@ require 'logger'
 
 module Metriks::Reporter
   class Logger
+    attr_accessor :prefix, :log_level, :logger
+
     def initialize(options = {})
       @logger    = options[:logger]    || ::Logger.new(STDOUT)
       @log_level = options[:log_level] || ::Logger::INFO
