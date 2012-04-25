@@ -12,6 +12,11 @@ module Metriks
       end
     end
 
+    def now_floored
+      time = Time.now.to_i
+      time - (time % @interval)
+    end
+
     def next_time
       now = Time.now.to_f
       @next_time = now if @next_time <= now

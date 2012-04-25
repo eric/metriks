@@ -120,7 +120,7 @@ module Metriks::Reporter
 
     def prepare_metric(base_name, metric, keys, snapshot_keys = [])
       results = []
-      time = Time.now.to_i
+      time = @time_tracker.now_floored
 
       base_name = base_name.to_s.gsub(/ +/, '_')
       if @prefix
