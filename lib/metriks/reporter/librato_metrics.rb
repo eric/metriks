@@ -12,14 +12,14 @@ module Metriks::Reporter
       @source = options[:source]
 
       @registry  = options[:registry] || Metriks::Registry.default
-      @interval  = options[:interval] || 60
+      @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
       @on_error  = options[:on_error] || proc { |ex| }
     end
 
     def start
       @thread ||= Thread.new do
         loop do
-          sleep @interval
+          @time_tracker.sleep
 
           Thread.new do
             begin
