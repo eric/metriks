@@ -1,4 +1,5 @@
 require 'logger'
+require 'metriks/time_tracker'
 
 module Metriks::Reporter
   class Logger
@@ -10,7 +11,7 @@ module Metriks::Reporter
       @prefix    = options[:prefix]    || 'metriks:'
 
       @registry     = options[:registry] || Metriks::Registry.default
-      @time_tracker = TimeTracker.new(options[:interval] || 60)
+      @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
       @on_error     = options[:on_error] || proc { |ex| }
     end
 
@@ -113,26 +114,6 @@ module Metriks::Reporter
         else arg
         end
       end.join(' ')
-    end
-
-    class TimeTracker
-      def initialize(interval)
-        @interval = interval
-        @next_time = Time.now.to_f
-      end
-
-      def sleep
-        sleep_time = next_time - Time.now.to_f
-        if sleep_time > 0
-          Kernel.sleep(sleep_time)
-        end
-      end
-
-      def next_time
-        now = Time.now.to_f
-        @next_time = now if @next_time <= now
-        @next_time += @interval - (@next_time % @interval)
-      end
     end
   end
 end
