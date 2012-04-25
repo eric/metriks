@@ -1,7 +1,6 @@
 require 'test/unit'
 require 'pp'
 
-require 'turn'
 require 'mocha'
 
 require 'metriks'
