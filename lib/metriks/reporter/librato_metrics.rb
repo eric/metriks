@@ -134,7 +134,7 @@ module Metriks::Reporter
         results << {
           :name => "#{base_name}.#{name}",
           :source => @source,
-          :time => time,
+          :measure_time => time,
           :value => value
         }
       end
@@ -148,7 +148,7 @@ module Metriks::Reporter
           results << {
             :name => "#{base_name}.#{name}",
             :source => @source,
-            :time => time,
+            :measure_time => time,
             :value => value
           }
         end
