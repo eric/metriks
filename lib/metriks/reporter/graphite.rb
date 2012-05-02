@@ -1,3 +1,4 @@
+require 'socket'
 
 module Metriks::Reporter
   class Graphite
