@@ -13,7 +13,7 @@ module Metriks
       end
 
       def restart
-        @interval.split
+        @interval = Hitimes::Interval.now
       end
 
       def stop
