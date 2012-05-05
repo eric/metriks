@@ -12,6 +12,10 @@ module Metriks
         @interval = Hitimes::Interval.now
       end
 
+      def restart
+        @interval.split
+      end
+
       def stop
         @interval.stop
         @timer.update(@interval.duration)
