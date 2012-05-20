@@ -80,7 +80,19 @@ module Metriks
           @start_time = Time.now
           @values.keys.each do |key|
             value = @values.delete(key)
-            @values[key * Math.exp(-@alpha * (@start_time - old_start_time))] = value
+            new_key = key * Math.exp(-@alpha * (@start_time - old_start_time))
+
+            if key.nan?
+              warn "ExponentiallyDecayingSample found a key of NaN. old_start_time: #{old_start_time.to_f} start_time: #{@start_time.to_f}"
+              next
+            end
+
+            if new_key.nan?
+              warn "ExponentiallyDecayingSample found a new_key of NaN. key: #{key} old_start_time: #{old_start_time.to_f} start_time: #{@start_time.to_f}"
+              next
+            end
+
+            @values[new_key] = value
           end
         end
       end
