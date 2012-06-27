@@ -14,7 +14,9 @@ the gem.
 
 To install, add this to your `Gemfile`:
 
-    gem 'metriks'
+``` ruby
+  gem 'metriks'
+```
 
 and re-run `bundle`.
 
@@ -287,7 +289,7 @@ How to get metrics out of the process.
 
 Sends metrics to Graphite every 60 seconds.
 
-```ruby
+``` ruby
   reporter = Metriks::Reporter::Graphite.new 'localhost', 3004
   reporter.start
 ```
@@ -297,7 +299,7 @@ Sends metrics to Graphite every 60 seconds.
 
 Send metrics to a logger every 60 seconds.
 
-```
+``` ruby
   reporter = Metriks::Reporter::Logger.new(:logger => Logger.new('log/metrics.log'))
   reporter.start
 ```
@@ -307,7 +309,7 @@ Send metrics to a logger every 60 seconds.
 
 Send metrics to Librato Metrics every 60 seconds.
 
-```
+``` ruby
   reporter = Metriks::Reporter::LibratoMetrics.new('email', 'token')
   reporter.start
 ```
@@ -318,7 +320,7 @@ Send metrics to Librato Metrics every 60 seconds.
 Provides a simple way to get up-to-date statistics from a process by
 updating the proctitle every 5 seconds (default).
 
-```ruby
+``` ruby
   reporter = Metriks::Reporter::ProcTitle.new :interval => 5
   reporter.add 'reqs', 'sec' do
     Metriks.meter('rack.requests').one_minute_rate
@@ -329,7 +331,7 @@ updating the proctitle every 5 seconds (default).
 will display:
 
 ```
-501      17015 26.0  1.9 416976 246956 ?       Ss   18:54  11:43 thin reqs: 273.3/sec
+  501      17015 26.0  1.9 416976 246956 ?       Ss   18:54  11:43 thin reqs: 273.3/sec
 ```
 
 
