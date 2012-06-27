@@ -15,7 +15,7 @@ the gem.
 To install, add this to your `Gemfile`:
 
 ``` ruby
-  gem 'metriks'
+gem 'metriks'
 ```
 
 and re-run `bundle`.
@@ -331,7 +331,7 @@ updating the proctitle every 5 seconds (default).
 will display:
 
 ```
-  501      17015 26.0  1.9 416976 246956 ?       Ss   18:54  11:43 thin reqs: 273.3/sec
+501      17015 26.0  1.9 416976 246956 ?       Ss   18:54  11:43 thin reqs: 273.3/sec
 ```
 
 
