@@ -1,3 +1,4 @@
+require 'metriks/time_tracker'
 require 'net/https'
 
 module Metriks::Reporter
