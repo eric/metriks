@@ -34,6 +34,7 @@ class RiemannReporterTest < Test::Unit::TestCase
     @registry.meter('meter.testing').mark
     @registry.counter('counter.testing').increment
     @registry.timer('timer.testing').update(1.5)
+    @registry.histogram('histogram.testing').update(1.5)
     @registry.utilization_timer('utilization_timer.testing').update(1.5)
 
     @reporter.client.expects(:<<).at_least_once
@@ -56,6 +57,13 @@ class RiemannReporterTest < Test::Unit::TestCase
       :service => "timer.testing max",
       :metric => 1.5,
       :tags => ["timer"],
+      :ttl => 90
+    )
+    @reporter.client.expects(:<<).with(
+      :host => "h",
+      :service => "histogram.testing max",
+      :metric => 1.5,
+      :tags => ["histogram"],
       :ttl => 90
     )
     @reporter.client.expects(:<<).with(

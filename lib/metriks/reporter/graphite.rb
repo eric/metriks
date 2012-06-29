@@ -76,6 +76,12 @@ module Metriks::Reporter
           ], [
             :median, :get_95th_percentile
           ]
+        when Metriks::Histogram
+          write_metric name, metric, [
+            :count, :min, :max, :mean, :stddev
+          ], [
+            :median, :get_95th_percentile
+          ]
         end
       end
     end

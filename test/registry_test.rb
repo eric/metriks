@@ -27,6 +27,18 @@ class RegistryTest < Test::Unit::TestCase
     assert_not_nil @registry.utilization_timer('testing')
   end
 
+  def test_histogram
+    assert_not_nil @registry.histogram('testing')
+  end
+
+  def test_mismatched_metrics
+    @registry.histogram('histogram')
+    assert_raises(RuntimeError) { @registry.timer('histogram') }
+
+    @registry.timer('timer')
+    assert_raises(RuntimeError) { @registry.histogram('timer') }
+  end
+
   def test_calling_counter_twice
     assert_not_nil @registry.counter('testing')
   end
