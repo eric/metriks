@@ -1,3 +1,4 @@
+require 'metriks/time_tracker'
 require 'net/https'
 
 module Metriks::Reporter
@@ -12,14 +13,14 @@ module Metriks::Reporter
       @source = options[:source]
 
       @registry  = options[:registry] || Metriks::Registry.default
-      @interval  = options[:interval] || 60
+      @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
       @on_error  = options[:on_error] || proc { |ex| }
     end
 
     def start
       @thread ||= Thread.new do
         loop do
-          sleep @interval
+          @time_tracker.sleep
 
           Thread.new do
             begin
@@ -110,8 +111,10 @@ module Metriks::Reporter
       end
     end
 
-    def form_data(gauges)
+    def form_data(metrics)
       data = {}
+
+      gauges = metrics.select { |m| m[:type] == "gauge" }
 
       gauges.each_with_index do |gauge, idx|
         gauge.each do |key, value|
@@ -121,12 +124,22 @@ module Metriks::Reporter
         end
       end
 
+      counters = metrics.select { |m| m[:type] == "counter" }
+
+      counters.each_with_index do |counter, idx|
+        counter.each do |key, value|
+          if value
+            data["counters[#{idx}][#{key}]"] = value.to_s
+          end
+        end
+      end
+
       data
     end
 
     def prepare_metric(base_name, metric, keys, snapshot_keys = [])
       results = []
-      time = Time.now.to_i
+      time = @time_tracker.now_floored
 
       base_name = base_name.to_s.gsub(/ +/, '_')
       if @prefix
@@ -138,9 +151,10 @@ module Metriks::Reporter
         value = metric.send(key)
 
         results << {
+          :type => name.to_s == "count" ? "counter" : "gauge",
           :name => "#{base_name}.#{name}",
           :source => @source,
-          :time => time,
+          :measure_time => time,
           :value => value
         }
       end
@@ -152,9 +166,10 @@ module Metriks::Reporter
           value = snapshot.send(key)
 
           results << {
+            :type => name.to_s == "count" ? "counter" : "gauge",
             :name => "#{base_name}.#{name}",
             :source => @source,
-            :time => time,
+            :measure_time => time,
             :value => value
           }
         end
