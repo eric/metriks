@@ -120,6 +120,23 @@ module Metriks
       add_or_get(name, Metriks::UtilizationTimer)
     end
 
+    # Public: Fetch or create a new histogram metric. Histograms record values
+    # and expose statistics about the distribution of the data like median and
+    # 95th percentile.
+    #
+    # name - The String name of the metric to define or fetch
+    #
+    # Examples
+    #
+    #   registry.histogram('backlog.wait')
+    #
+    # Returns the Metricks::Histogram identified by the name.
+    def histogram(name)
+      add_or_get(name, Metriks::Histogram) do
+        Metriks::Histogram.new_exponentially_decaying
+      end
+    end
+
     # Public: Fetch an existing metric.
     #
     # name - The String name of the metric to fetch
@@ -157,7 +174,7 @@ module Metriks
     end
 
     protected
-    def add_or_get(name, klass)
+    def add_or_get(name, klass, &create_metric)
       @mutex.synchronize do
         if metric = @metrics[name]
           if !metric.is_a?(klass)
@@ -166,7 +183,7 @@ module Metriks
             return metric
           end
         else
-          @metrics[name] = klass.new
+          @metrics[name] = create_metric ? create_metric.call : klass.new
         end
       end
     end

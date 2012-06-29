@@ -21,6 +21,10 @@ module Metriks
   def self.meter(name)
     Metriks::Registry.default.meter(name)
   end
+
+  def self.histogram(name)
+    Metriks::Registry.default.histogram(name)
+  end
 end
 
 require 'metriks/registry'
