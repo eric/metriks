@@ -21,6 +21,7 @@ class LoggerReporterTest < Test::Unit::TestCase
     @registry.meter('meter.testing').mark
     @registry.counter('counter.testing').increment
     @registry.timer('timer.testing').update(1.5)
+    @registry.histogram('histogram.testing').update(1.5)
     @registry.utilization_timer('utilization_timer.testing').update(1.5)
   end
 

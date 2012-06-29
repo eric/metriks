@@ -24,4 +24,8 @@ class MetriksTest < Test::Unit::TestCase
   def test_utilization_timer
     assert_not_nil Metriks.utilization_timer('testing')
   end
+
+  def test_histogram
+    assert_not_nil Metriks.histogram('testing')
+  end
 end
