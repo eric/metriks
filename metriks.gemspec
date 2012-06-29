@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'metriks'
-  s.version           = '0.9.8.4'
-  s.date              = '2012-05-20'
+  s.version           = '0.9.9'
+  s.date              = '2012-06-29'
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
@@ -72,6 +72,7 @@ Gem::Specification.new do |s|
     lib/metriks/reporter/riemann.rb
     lib/metriks/simple_moving_average.rb
     lib/metriks/snapshot.rb
+    lib/metriks/time_tracker.rb
     lib/metriks/timer.rb
     lib/metriks/uniform_sample.rb
     lib/metriks/utilization_timer.rb
