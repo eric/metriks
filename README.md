@@ -348,9 +348,12 @@ An incomplete list of things I would like to see added:
 
 # Credits
 
-Most of the inspiration for this project comes from the amazing talk that
-Code Hale gave at CodeConf and his sweet
-[Metrics](https://github.com/codahale/metrics) Java library.
+Most of the inspiration for this project comes from Coda Hale's amazing
+[Metrics, Metrics Everywhere][metrics-talk] talk and his sweet
+[Metrics][metrics] Java Library.
+
+[metrics-talk]: http://pivotallabs.com/talks/139-metrics-metrics-everywhere
+[metrics]: https://github.com/codahale/metrics
 
 
 # License
