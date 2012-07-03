@@ -39,6 +39,7 @@ module Metriks
     def update(value, timestamp = Time.now)
       @mutex.synchronize do
         priority = weight(timestamp - @start_time) / rand
+        priority = Float::MAX if priority.infinite?
         new_count = @count.update { |v| v + 1 }
 
         if priority.nan?
