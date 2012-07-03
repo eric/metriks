@@ -187,7 +187,7 @@ class HistogramTest < Test::Unit::TestCase
   end
 
   def test_long_idle_sample
-    Time.stubs(:now).returns(Time.new(2000))
+    Time.stubs(:now).returns(Time.at(2000))
     sample = Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA)
     Time.unstub(:now)
     @histogram = Metriks::Histogram.new(sample)
