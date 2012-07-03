@@ -185,4 +185,15 @@ class HistogramTest < Test::Unit::TestCase
 
     assert_equal 49.5, snapshot.median
   end
+
+  def test_long_idle_sample
+    Time.stubs(:now).returns(Time.new(2000))
+    sample = Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA)
+    Time.unstub(:now)
+    @histogram = Metriks::Histogram.new(sample)
+
+    @histogram.update(5)
+
+    assert_equal 5, @histogram.min
+  end
 end
