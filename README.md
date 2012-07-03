@@ -349,7 +349,7 @@ An incomplete list of things I would like to see added:
 # Credits
 
 Most of the inspiration for this project comes from Coda Hale's amazing
-[Metrics, Metrics Everywhere][metrics-talk] talk and his sweet
+[Metrics, Metrics Everywhere][metrics-talk] talk at CodeConf and his sweet
 [Metrics][metrics] Java Library.
 
 [metrics-talk]: http://pivotallabs.com/talks/139-metrics-metrics-everywhere
