@@ -31,4 +31,23 @@ class LibratoMetricsReporterTest < Test::Unit::TestCase
 
     @reporter.write
   end
+
+  def assert_generated(count, options)
+    @registry.timer('timer.testing').update(1.5)
+
+    metrics = build_reporter(options).prepare_metrics
+    assert_equal(count, metrics.length)
+  end
+
+  def test_no_filters
+    assert_generated(11, {})
+  end
+
+  def test_only
+    assert_generated(2, {:only => [:count, :median]})
+  end
+
+  def test_except
+    assert_generated(9, {:except => [:count, :median]})
+  end
 end

@@ -49,7 +49,7 @@ module Metriks::Reporter
       start
     end
 
-    def write
+    def prepare_metrics
       gauges = []
       @registry.each do |name, metric|
         gauges << case metric
@@ -90,9 +90,12 @@ module Metriks::Reporter
       end
 
       gauges.flatten!
+    end
 
+    def write
+      gauges = prepare_metrics
       unless gauges.empty?
-        submit(form_data(gauges.flatten))
+        submit(form_data(gauges))
       end
     end
 
@@ -152,11 +155,11 @@ module Metriks::Reporter
         base_name = "#{@prefix}.#{base_name}"
       end
 
-      if @only
+      if @only.any?
         keys = keys & @only
         snapshot_keys = snapshot_keys & @only
       end
-      if @except
+      if @except.any?
         keys = keys - @except
         snapshot_keys = snapshot_keys - @except
       end
