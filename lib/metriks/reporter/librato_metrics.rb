@@ -15,6 +15,12 @@ module Metriks::Reporter
       @registry  = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
       @on_error  = options[:on_error] || proc { |ex| }
+
+      if options[:only] and options[:except]
+        raise 'Can only specify one of :only or :except'
+      end
+      @only     = options[:only] || []
+      @except   = options[:except] || []
     end
 
     def start
@@ -144,6 +150,15 @@ module Metriks::Reporter
       base_name = base_name.to_s.gsub(/ +/, '_')
       if @prefix
         base_name = "#{@prefix}.#{base_name}"
+      end
+
+      if @only
+        keys = keys & @only
+        snapshot_keys = snapshot_keys & @only
+      end
+      if @except
+        keys = keys - @except
+        snapshot_keys = snapshot_keys - @except
       end
 
       keys.flatten.each do |key|
