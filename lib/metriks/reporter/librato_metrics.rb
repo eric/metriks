@@ -90,6 +90,7 @@ module Metriks::Reporter
       end
 
       gauges.flatten!
+      gauges
     end
 
     def write
