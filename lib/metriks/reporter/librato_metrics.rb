@@ -15,6 +15,9 @@ module Metriks::Reporter
       @registry  = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
       @on_error  = options[:on_error] || proc { |ex| }
+
+      @only   = options[:only]   || :all
+      @except = options[:except] || :none
     end
 
     def start
@@ -86,6 +89,22 @@ module Metriks::Reporter
       gauges.flatten!
 
       unless gauges.empty?
+        unless @only == :all
+          gauges.select! do |gauge|
+            @only.any? do |matcher|
+              matcher === gauge[:name]
+            end
+          end
+        end
+
+        unless @except == :none
+          gauges.reject! do |gauge|
+            @except.any? do |matcher|
+              matcher === gauge[:name]
+            end
+          end
+        end
+
         submit(form_data(gauges.flatten))
       end
     end
