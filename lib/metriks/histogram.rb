@@ -108,5 +108,17 @@ module Metriks
         new_values
       end
     end
+
+    def each(&block)
+      report_snapshot = snapshot
+      { 'count'           => count,
+        'min'             => min,
+        'max'             => max,
+        'mean'            => mean,
+        'stddev'          => stddev,
+        'median'          => report_snapshot.median,
+        '95th_percentile' => report_snapshot.get_95th_percentile
+      }.each(&block)
+    end
   end
 end

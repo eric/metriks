@@ -69,5 +69,14 @@ module Metriks
     def stop
       @thread.kill
     end
+
+    def each(&block)
+      { 'count'               => count,
+        'one_minute_rate'     => one_minute_rate,
+        'five_minute_rate'    => five_minute_rate,
+        'fifteen_minute_rate' => fifteen_minute_rate,
+        'mean_rate'           => mean_rate
+      }.each(&block)
+    end
   end
 end

@@ -40,5 +40,9 @@ module Metriks
     def count
       @count.value
     end
+
+    def each(&block)
+      { 'count' => count }.each(&block)
+    end
   end
 end

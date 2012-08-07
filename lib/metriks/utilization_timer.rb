@@ -39,5 +39,25 @@ module Metriks
       super
       @duration_meter.stop
     end
+
+    def each(&block)
+      report_snapshot = snapshot
+      { 'count'                      => count,
+        'one_minute_rate'            => one_minute_rate,
+        'five_minute_rate'           => five_minute_rate,
+        'fifteen_minute_rate'        => fifteen_minute_rate,
+        'mean_rate'                  => mean_rate,
+        'min'                        => min,
+        'max'                        => max,
+        'mean'                       => mean,
+        'stddev'                     => stddev,
+        'one_minute_utilization'     => one_minute_utilization,
+        'five_minute_utilization'    => five_minute_utilization,
+        'fifteen_minute_utilization' => fifteen_minute_utilization,
+        'mean_utilization'           => mean_utilization,
+        'median'                     => report_snapshot.median,
+        '95th_percentile'            => report_snapshot.get_95th_percentile
+      }.each(&block)
+    end
   end
 end
