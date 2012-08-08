@@ -65,9 +65,9 @@ module Metriks::Reporter
       @registry.each do |base_name, metric|
         base_name = base_name.to_s.gsub(/ +/, '_')
         base_name = "#{prefix}.#{base_name}" if prefix
+        time      = @time_tracker.now_floored
 
         metric.each do |name, value|
-          time = @time_tracker.now_floored
           metrics << {
             :type => name.to_s == "count" ? "counter" : "gauge",
             :name => "#{base_name}.#{name}",

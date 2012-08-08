@@ -191,10 +191,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
 
   # TODO: This tests too much.
   def test_write_several_metrics
-    Metriks::TimeTracker.any_instance.stubs(:now_floored).
-           returns(42).
-      then.returns(43).
-      then.returns(44)
+    Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42)
 
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
@@ -205,11 +202,11 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                  'gauges[0][value]'        => '1.1',
                  'gauges[1][type]'         => 'gauge',
                  'gauges[1][name]'         => 'registry.two',
-                 'gauges[1][measure_time]' => '43',
+                 'gauges[1][measure_time]' => '42',
                  'gauges[1][value]'        => '2.2',
                  'gauges[2][type]'         => 'gauge',
                  'gauges[2][name]'         => 'registry.three',
-                 'gauges[2][measure_time]' => '44',
+                 'gauges[2][measure_time]' => '42',
                  'gauges[2][value]'        => '3.3' }
 
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
@@ -230,6 +227,19 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
     reporter.expects(:submit).with(expected)
+    reporter.write
+  end
+
+  def test_write_records_times_once_per_metric
+    Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42).twice
+
+    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
+                             [ 'registry', stub_iterator([ 'two',   2.2 ],
+                                                         [ 'three', 3.3 ]) ])
+
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :registry => registry)
+    reporter.expects(:submit)
     reporter.write
   end
 end
