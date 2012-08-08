@@ -111,14 +111,13 @@ module Metriks
 
     def each(&block)
       report_snapshot = snapshot
-      { 'count'           => count,
-        'min'             => min,
-        'max'             => max,
-        'mean'            => mean,
-        'stddev'          => stddev,
-        'median'          => report_snapshot.median,
-        '95th_percentile' => report_snapshot.get_95th_percentile
-      }.each(&block)
+      yield 'count',           count
+      yield 'min',             min
+      yield 'max',             max
+      yield 'mean',            mean
+      yield 'stddev',          stddev
+      yield 'median',          report_snapshot.median
+      yield '95th_percentile', report_snapshot.get_95th_percentile
     end
   end
 end

@@ -42,7 +42,7 @@ module Metriks
     end
 
     def each(&block)
-      { 'count' => count }.each(&block)
+      yield 'count', count
     end
   end
 end

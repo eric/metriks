@@ -71,12 +71,11 @@ module Metriks
     end
 
     def each(&block)
-      { 'count'               => count,
-        'one_minute_rate'     => one_minute_rate,
-        'five_minute_rate'    => five_minute_rate,
-        'fifteen_minute_rate' => fifteen_minute_rate,
-        'mean_rate'           => mean_rate
-      }.each(&block)
+      yield 'count',               count
+      yield 'one_minute_rate',     one_minute_rate
+      yield 'five_minute_rate',    five_minute_rate
+      yield 'fifteen_minute_rate', fifteen_minute_rate
+      yield 'mean_rate',           mean_rate
     end
   end
 end
