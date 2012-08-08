@@ -1,3 +1,4 @@
+require 'metriks/registry'
 require 'metriks/time_tracker'
 require 'net/https'
 
@@ -6,18 +7,25 @@ module Metriks::Reporter
     attr_accessor :prefix, :source
 
     def initialize(email, token, options = {})
-      @email = email
-      @token = token
+      options = default_options.merge options
 
-      @prefix = options[:prefix]
-      @source = options[:source]
+      @email        = email
+      @token        = token
+      @prefix       = options[:prefix]
+      @source       = options[:source]
+      @registry     = options[:registry]
+      @interval     = options[:interval]
+      @only         = options[:only]
+      @except       = options[:except]
+      @on_error     = options[:on_error] || proc { |ex| }
+      @time_tracker = Metriks::TimeTracker.new @interval
+    end
 
-      @registry  = options[:registry] || Metriks::Registry.default
-      @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
-      @on_error  = options[:on_error] || proc { |ex| }
-
-      @only   = options[:only]   || :all
-      @except = options[:except] || :none
+    def default_options
+      { :interval => 60,
+        :registry => Metriks::Registry.default,
+        :only     => :all,
+        :except   => :none }
     end
 
     def start
@@ -56,14 +64,14 @@ module Metriks::Reporter
 
       @registry.each do |base_name, metric|
         base_name = base_name.to_s.gsub(/ +/, '_')
-        base_name = "#{@prefix}.#{base_name}" if @prefix
+        base_name = "#{prefix}.#{base_name}" if prefix
 
         metric.each do |name, value|
           time = @time_tracker.now_floored
           metrics << {
             :type => name.to_s == "count" ? "counter" : "gauge",
             :name => "#{base_name}.#{name}",
-            :source => @source,
+            :source => source,
             :measure_time => time,
             :value => value
           }
