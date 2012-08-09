@@ -7,26 +7,16 @@ module Metriks::Reporter
     attr_accessor :prefix, :source
 
     def initialize(email, token, options = {})
-      options = default_options.merge options
-
       @email        = email
       @token        = token
       @prefix       = options[:prefix]
       @source       = options[:source]
-      @registry     = options[:registry]
-      @interval     = options[:interval]
-      @only         = options[:only]
-      @except       = options[:except]
-      @on_error     = options[:on_error]
+      @registry     = options[:registry] || Metriks::Registry.default
+      @interval     = options[:interval] || 60
+      @only         = options[:only]     || :all
+      @except       = options[:except]   || :none
+      @on_error     = options[:on_error] || proc { |ex| }
       @time_tracker = Metriks::TimeTracker.new @interval
-    end
-
-    def default_options
-      { :interval => 60,
-        :registry => Metriks::Registry.default,
-        :only     => :all,
-        :except   => :none,
-        :on_error => proc { |ex| }}
     end
 
     def start
