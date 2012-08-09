@@ -46,4 +46,16 @@ class RegistryTest < Test::Unit::TestCase
   def test_default
     assert_not_nil Metriks::Registry.default
   end
+
+  def test_each
+    counter = @registry.counter('counter')
+    meter   = @registry.meter('meter')
+    metrics = []
+    @registry.each do |name, metric|
+      metrics << [ name, metric ]
+    end
+    assert_equal 2, metrics.size
+    assert_equal [ 'counter', counter ], metrics.first
+    assert_equal [ 'meter',   meter   ], metrics.last
+  end
 end
