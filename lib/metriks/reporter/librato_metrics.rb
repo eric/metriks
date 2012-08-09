@@ -52,11 +52,11 @@ module Metriks::Reporter
 
     def prepare_all_metrics
       metrics = []
+      time    = @time_tracker.now_floored
 
       @registry.each do |base_name, metric|
         base_name = base_name.to_s.gsub(/ +/, '_')
         base_name = "#{prefix}.#{base_name}" if prefix
-        time      = @time_tracker.now_floored
 
         metric.each do |name, value|
           metrics << {

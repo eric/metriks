@@ -348,8 +348,8 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.write
   end
 
-  def test_write_records_times_once_per_metric
-    Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42).twice
+  def test_write_records_times_once_per_write
+    Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42).once
     metric_one = stub do
       stubs(:each).yields([ 'one', 1.1 ])
     end
