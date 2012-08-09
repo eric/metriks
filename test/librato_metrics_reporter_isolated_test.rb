@@ -179,11 +179,11 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_specify_error_handler
+    Metriks::TimeTracker.any_instance.stubs(:sleep)
     handler = stub
     handler.expects(:[]).with(kind_of(RuntimeError)).at_least_once
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
-                                                    :interval => 0.001,
-                                                    :on_error => handler)
+                                                     :on_error => handler)
     def reporter.write() raise('write') end
 
     reporter.start
@@ -192,11 +192,11 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_swallows_errors_raised_in_error_handler
+    Metriks::TimeTracker.any_instance.stubs(:sleep)
     handler = stub
     handler.expects(:[]).raises(RuntimeError).at_least_once
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
-                                                    :interval => 0.001,
-                                                    :on_error => handler)
+                                                     :on_error => handler)
     def reporter.write() raise('write') end
 
     reporter.start
@@ -205,8 +205,8 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_default_error_handler_swallows_errors
-    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
-                                                    :interval => 0.001)
+    Metriks::TimeTracker.any_instance.stubs(:sleep)
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password')
     def reporter.write() raise('write') end
 
     reporter.start
@@ -217,8 +217,8 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   ### Public Methods
 
   def test_stop
-    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
-                                                    :interval => 0.001)
+    Metriks::TimeTracker.any_instance.stubs(:sleep)
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password')
     reporter.start
     reporter.stop
     reporter.expects(:write).never
