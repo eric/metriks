@@ -12,13 +12,13 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
-      stubs(:each).yields('registry', metric)
+      stubs(:each).yields('counter', metric)
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :prefix   => 'prefix',
                                          :registry => registry)
     reporter.expects(:submit).
-      with(has_entry('counters[0][name]' => 'prefix.registry.count'))
+      with(has_entry('counters[0][name]' => 'prefix.counter.count'))
     reporter.write
     assert_equal 'prefix', reporter.prefix
   end
@@ -28,12 +28,12 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
-      stubs(:each).yields('registry', metric)
+      stubs(:each).yields('counter', metric)
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry)
     reporter.expects(:submit).
-      with(has_entry('counters[0][name]' => 'registry.count'))
+      with(has_entry('counters[0][name]' => 'counter.count'))
     reporter.write
     assert_nil reporter.prefix
   end
@@ -43,7 +43,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
-      stubs(:each).yields('registry', metric)
+      stubs(:each).yields('counter', metric)
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :source   => 'source',
@@ -59,7 +59,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
-      stubs(:each).yields('registry', metric)
+      stubs(:each).yields('counter', metric)
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry)
@@ -104,17 +104,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                                    [ 'three', 3.3 ])
     end
     registry = stub do
-      stubs(:each).multiple_yields([ 'registry', metric_one ],
-                                   [ 'registry', metric_two ])
+      stubs(:each).multiple_yields([ 'metric_one', metric_one ],
+                                   [ 'metric_two', metric_two ])
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
-                                         :only     => ['registry.one'])
+                                         :only     => ['metric_one.one'])
     reporter.expects(:submit).with do |data|
       data.has_key?('gauges[0][name]')    &&
         !data.has_key?('gauges[1][name]') &&
         !data.has_key?('gauges[2][name]') &&
-        data['gauges[0][name]'] == 'registry.one'
+        data['gauges[0][name]'] == 'metric_one.one'
     end
     reporter.write
   end
@@ -128,19 +128,19 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                                    [ 'three', 3.3 ])
     end
     registry = stub do
-      stubs(:each).multiple_yields([ 'registry', metric_one ],
-                                   [ 'registry', metric_two ])
+      stubs(:each).multiple_yields([ 'metric_one', metric_one ],
+                                   [ 'metric_two', metric_two ])
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
-                                         :only     => %w( registry.one
-                                                          registry.three ))
+                                         :only     => %w( metric_one.one
+                                                          metric_two.three ))
     reporter.expects(:submit).with do |data|
       data.has_key?('gauges[0][name]')    &&
         data.has_key?('gauges[1][name]')  &&
         !data.has_key?('gauges[2][name]') &&
-        data['gauges[0][name]'] == 'registry.one' &&
-        data['gauges[1][name]'] == 'registry.three'
+        data['gauges[0][name]'] == 'metric_one.one' &&
+        data['gauges[1][name]'] == 'metric_two.three'
     end
     reporter.write
   end
@@ -154,13 +154,13 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                                    [ 'three', 3.3 ])
     end
     registry = stub do
-      stubs(:each).multiple_yields([ 'registry', metric_one ],
-                                   [ 'registry', metric_two ])
+      stubs(:each).multiple_yields([ 'metric_one', metric_one ],
+                                   [ 'metric_two', metric_two ])
     end
     matcher = stub
-    matcher.expects(:===).with('registry.one')
-    matcher.expects(:===).with('registry.two')
-    matcher.expects(:===).with('registry.three')
+    matcher.expects(:===).with('metric_one.one')
+    matcher.expects(:===).with('metric_two.two')
+    matcher.expects(:===).with('metric_two.three')
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
                                          :only     => [matcher])
@@ -176,18 +176,18 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                                    [ 'three', 3.3 ])
     end
     registry = stub do
-      stubs(:each).multiple_yields([ 'registry', metric_one ],
-                                   [ 'registry', metric_two ])
+      stubs(:each).multiple_yields([ 'metric_one', metric_one ],
+                                   [ 'metric_two', metric_two ])
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
-                                         :except   => ['registry.one'])
+                                         :except   => ['metric_one.one'])
     reporter.expects(:submit).with do |data|
       data.has_key?('gauges[0][name]')    &&
         data.has_key?('gauges[1][name]')  &&
         !data.has_key?('gauges[2][name]') &&
-        data['gauges[0][name]'] == 'registry.two' &&
-        data['gauges[1][name]'] == 'registry.three'
+        data['gauges[0][name]'] == 'metric_two.two' &&
+        data['gauges[1][name]'] == 'metric_two.three'
     end
     reporter.write
   end
@@ -201,18 +201,18 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                                    [ 'three', 3.3 ])
     end
     registry = stub do
-      stubs(:each).multiple_yields([ 'registry', metric_one ],
-                                   [ 'registry', metric_two ])
+      stubs(:each).multiple_yields([ 'metric_one', metric_one ],
+                                   [ 'metric_two', metric_two ])
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
-                                         :except   => %w( registry.one
-                                                          registry.three ))
+                                         :except   => %w( metric_one.one
+                                                          metric_two.three ))
     reporter.expects(:submit).with do |data|
       data.has_key?('gauges[0][name]')    &&
         !data.has_key?('gauges[1][name]') &&
         !data.has_key?('gauges[2][name]') &&
-        data['gauges[0][name]'] == 'registry.two'
+        data['gauges[0][name]'] == 'metric_two.two'
     end
     reporter.write
   end
@@ -226,13 +226,13 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                                    [ 'three', 3.3 ])
     end
     registry = stub do
-      stubs(:each).multiple_yields([ 'registry', metric_one ],
-                                   [ 'registry', metric_two ])
+      stubs(:each).multiple_yields([ 'metric_one', metric_one ],
+                                   [ 'metric_two', metric_two ])
     end
     matcher = stub
-    matcher.expects(:===).with('registry.one')
-    matcher.expects(:===).with('registry.two')
-    matcher.expects(:===).with('registry.three')
+    matcher.expects(:===).with('metric_one.one')
+    matcher.expects(:===).with('metric_two.two')
+    matcher.expects(:===).with('metric_two.three')
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
                                          :except   => [matcher])
@@ -298,12 +298,12 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).yields([ 'one', 1.1 ])
     end
     registry = stub do
-      stubs(:each).yields([ 'registry', metric ])
+      stubs(:each).yields([ 'metric', metric ])
     end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry)
     expected = { 'gauges[0][type]'         => 'gauge',
-                 'gauges[0][name]'         => 'registry.one',
+                 'gauges[0][name]'         => 'metric.one',
                  'gauges[0][measure_time]' => '42',
                  'gauges[0][value]'        => '1.1' }
     reporter.expects(:submit).with(expected)
@@ -319,16 +319,16 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                                    [ 'three', 3.3 ])
     end
     registry = stub do
-      stubs(:each).multiple_yields([ 'registry', metric_one ],
-                                   [ 'registry', metric_two ])
+      stubs(:each).multiple_yields([ 'metric_one', metric_one ],
+                                   [ 'metric_two', metric_two ])
     end
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
-    expected = { 'gauges[0][name]'  => 'registry.one',
+    expected = { 'gauges[0][name]'  => 'metric_one.one',
                  'gauges[0][value]' => '1.1',
-                 'gauges[1][name]'  => 'registry.two',
+                 'gauges[1][name]'  => 'metric_two.two',
                  'gauges[1][value]' => '2.2',
-                 'gauges[2][name]'  => 'registry.three',
+                 'gauges[2][name]'  => 'metric_two.three',
                  'gauges[2][value]' => '3.3' }
     reporter.expects(:submit).with(has_entries(expected))
     reporter.write
@@ -339,7 +339,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
-      stubs(:each).yields([ 'registry', metric ])
+      stubs(:each).yields([ 'metric', metric ])
     end
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
@@ -358,8 +358,8 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
                                    [ 'three', 3.3 ])
     end
     registry = stub do
-      stubs(:each).multiple_yields([ 'registry', metric_one ],
-                                   [ 'registry', metric_two ])
+      stubs(:each).multiple_yields([ 'metric_one', metric_one ],
+                                   [ 'metric_two', metric_two ])
     end
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
