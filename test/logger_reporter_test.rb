@@ -37,6 +37,23 @@ class LoggerReporterTest < Test::Unit::TestCase
     assert_match /median=\d/, @stringio.string
   end
 
+  def test_write_regression
+    Time.stubs(:now).returns(Time.new(2012, 4, 1))
+    Metriks::Meter.any_instance.stubs(:mean_rate).returns('42')
+    Metriks::UtilizationTimer.any_instance.stubs(:mean_utilization).returns('42')
+
+    expected = "INFO -- : metriks: time=1333252800 name=meter.testing type=meter count=1 one_minute_rate=0.0 five_minute_rate=0.0 fifteen_minute_rate=0.0 mean_rate=42
+INFO -- : metriks: time=1333252800 name=counter.testing type=counter count=1
+INFO -- : metriks: time=1333252800 name=timer.testing type=timer count=1 one_minute_rate=0.0 five_minute_rate=0.0 fifteen_minute_rate=0.0 mean_rate=42 min=1.5 max=1.5 mean=1.5 stddev=0.0 median=1.5 95th_percentile=1.5
+INFO -- : metriks: time=1333252800 name=histogram.testing type=histogram count=1 min=1.5 max=1.5 mean=1.5 stddev=0.0 median=1.5 95th_percentile=1.5
+INFO -- : metriks: time=1333252800 name=utilization_timer.testing type=utilization_timer count=1 one_minute_rate=0.0 five_minute_rate=0.0 fifteen_minute_rate=0.0 mean_rate=42 min=1.5 max=1.5 mean=1.5 stddev=0.0 one_minute_utilization=0.0 five_minute_utilization=0.0 fifteen_minute_utilization=0.0 mean_utilization=42 median=1.5 95th_percentile=1.5
+"
+
+    @reporter.write
+    output = @stringio.string.gsub!(/^I,.* INFO/, 'INFO')
+    assert_equal expected, output
+  end
+
   def test_flush
     @reporter.flush
 
