@@ -239,54 +239,49 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     assert_nothing_raised { reporter.stop }
   end
 
-  # TODO: This tests too much.
-  def test_write_several_metrics
+  def test_write
     Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42)
-
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    registry = stub_iterator([ 'registry', stub_iterator([ 'one', 1.1 ])])
+    reporter = Metriks::Reporter::LibratoMetrics.
+                 new('user', 'password', :registry => registry)
     expected = { 'gauges[0][type]'         => 'gauge',
                  'gauges[0][name]'         => 'registry.one',
                  'gauges[0][measure_time]' => '42',
-                 'gauges[0][value]'        => '1.1',
-                 'gauges[1][type]'         => 'gauge',
-                 'gauges[1][name]'         => 'registry.two',
-                 'gauges[1][measure_time]' => '42',
-                 'gauges[1][value]'        => '2.2',
-                 'gauges[2][type]'         => 'gauge',
-                 'gauges[2][name]'         => 'registry.three',
-                 'gauges[2][measure_time]' => '42',
-                 'gauges[2][value]'        => '3.3' }
-
-    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
-                                                     :registry => registry)
+                 'gauges[0][value]'        => '1.1' }
     reporter.expects(:submit).with(expected)
     reporter.write
   end
 
-  def test_write_counters
-    Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42)
-
-    registry = stub_iterator([ 'registry', stub_iterator([ 'count', 1 ])])
-    expected = { 'counters[0][type]'         => 'counter',
-                 'counters[0][name]'         => 'registry.count',
-                 'counters[0][measure_time]' => '42',
-                 'counters[0][value]'        => '1' }
-
+  def test_write_several_metrics
+    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
+                             [ 'registry', stub_iterator([ 'two',   2.2 ],
+                                                         [ 'three', 3.3 ]) ])
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
-    reporter.expects(:submit).with(expected)
+    expected = { 'gauges[0][name]'  => 'registry.one',
+                 'gauges[0][value]' => '1.1',
+                 'gauges[1][name]'  => 'registry.two',
+                 'gauges[1][value]' => '2.2',
+                 'gauges[2][name]'  => 'registry.three',
+                 'gauges[2][value]' => '3.3' }
+    reporter.expects(:submit).with(has_entries(expected))
+    reporter.write
+  end
+
+  def test_write_counters
+    registry = stub_iterator([ 'registry', stub_iterator([ 'count', 1 ])])
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :registry => registry)
+    expected = { 'counters[0][type]' => 'counter' }
+    reporter.expects(:submit).with(has_entries(expected))
     reporter.write
   end
 
   def test_write_records_times_once_per_metric
     Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42).twice
-
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
                                                          [ 'three', 3.3 ]) ])
-
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
     reporter.expects(:submit)
