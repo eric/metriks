@@ -5,22 +5,18 @@ require 'metriks/reporter/librato_metrics'
 Thread.abort_on_exception = true
 
 class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
-  def stub_iterator(*args)
-    metric = stub
-    metric.expects(:each).multiple_yields(*args)
-    metric
-  end
-
-  def simple_registry
-    stub_iterator([ 'registry', stub_iterator([ 'count', 1 ])])
-  end
-
   ### Options
 
   def test_prefix_metric_names
+    metric = stub do
+      stubs(:each).yields([ 'count', 1 ])
+    end
+    registry = stub do
+      stubs(:each).yields('registry', metric)
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :prefix   => 'prefix',
-                                         :registry => simple_registry)
+                                         :registry => registry)
     reporter.expects(:submit).
       with(has_entry('counters[0][name]' => 'prefix.registry.count'))
     reporter.write
@@ -28,8 +24,14 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_default_prefix_is_blank
+    metric = stub do
+      stubs(:each).yields([ 'count', 1 ])
+    end
+    registry = stub do
+      stubs(:each).yields('registry', metric)
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :registry => simple_registry)
+                 new('user', 'password', :registry => registry)
     reporter.expects(:submit).
       with(has_entry('counters[0][name]' => 'registry.count'))
     reporter.write
@@ -37,9 +39,15 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_specify_source
+    metric = stub do
+      stubs(:each).yields([ 'count', 1 ])
+    end
+    registry = stub do
+      stubs(:each).yields('registry', metric)
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :source   => 'source',
-                                         :registry => simple_registry)
+                                         :registry => registry)
     reporter.expects(:submit).
       with(has_entry('counters[0][source]' => 'source'))
     reporter.write
@@ -47,8 +55,14 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_default_source_is_omitted
+    metric = stub do
+      stubs(:each).yields([ 'count', 1 ])
+    end
+    registry = stub do
+      stubs(:each).yields('registry', metric)
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :registry => simple_registry)
+                 new('user', 'password', :registry => registry)
     reporter.expects(:submit).with(Not(has_key('counters[0][source]')))
     reporter.write
     assert_nil reporter.source
@@ -82,9 +96,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_report_only_matching_metric
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    metric_one = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    metric_two = stub do
+      stubs(:each).multiple_yields([ 'two',   2.2 ],
+                                   [ 'three', 3.3 ])
+    end
+    registry = stub do
+      stubs(:each).multiple_yields([ 'registry', metric_one ],
+                                   [ 'registry', metric_two ])
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
                                          :only     => ['registry.one'])
@@ -98,9 +120,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_report_only_several_matching_metric
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    metric_one = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    metric_two = stub do
+      stubs(:each).multiple_yields([ 'two',   2.2 ],
+                                   [ 'three', 3.3 ])
+    end
+    registry = stub do
+      stubs(:each).multiple_yields([ 'registry', metric_one ],
+                                   [ 'registry', metric_two ])
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
                                          :only     => %w( registry.one
@@ -116,9 +146,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_only_matches_using_threequals_operator
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    metric_one = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    metric_two = stub do
+      stubs(:each).multiple_yields([ 'two',   2.2 ],
+                                   [ 'three', 3.3 ])
+    end
+    registry = stub do
+      stubs(:each).multiple_yields([ 'registry', metric_one ],
+                                   [ 'registry', metric_two ])
+    end
     matcher = stub
     matcher.expects(:===).with('registry.one')
     matcher.expects(:===).with('registry.two')
@@ -130,9 +168,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_report_except_matching_metric
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    metric_one = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    metric_two = stub do
+      stubs(:each).multiple_yields([ 'two',   2.2 ],
+                                   [ 'three', 3.3 ])
+    end
+    registry = stub do
+      stubs(:each).multiple_yields([ 'registry', metric_one ],
+                                   [ 'registry', metric_two ])
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
                                          :except   => ['registry.one'])
@@ -147,9 +193,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_report_except_several_matching_metric
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    metric_one = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    metric_two = stub do
+      stubs(:each).multiple_yields([ 'two',   2.2 ],
+                                   [ 'three', 3.3 ])
+    end
+    registry = stub do
+      stubs(:each).multiple_yields([ 'registry', metric_one ],
+                                   [ 'registry', metric_two ])
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
                                          :except   => %w( registry.one
@@ -164,9 +218,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_except_matches_using_threequals_operator
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    metric_one = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    metric_two = stub do
+      stubs(:each).multiple_yields([ 'two',   2.2 ],
+                                   [ 'three', 3.3 ])
+    end
+    registry = stub do
+      stubs(:each).multiple_yields([ 'registry', metric_one ],
+                                   [ 'registry', metric_two ])
+    end
     matcher = stub
     matcher.expects(:===).with('registry.one')
     matcher.expects(:===).with('registry.two')
@@ -232,7 +294,12 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
 
   def test_write
     Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42)
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one', 1.1 ])])
+    metric = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    registry = stub do
+      stubs(:each).yields([ 'registry', metric ])
+    end
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry)
     expected = { 'gauges[0][type]'         => 'gauge',
@@ -244,9 +311,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_write_several_metrics
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    metric_one = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    metric_two = stub do
+      stubs(:each).multiple_yields([ 'two',   2.2 ],
+                                   [ 'three', 3.3 ])
+    end
+    registry = stub do
+      stubs(:each).multiple_yields([ 'registry', metric_one ],
+                                   [ 'registry', metric_two ])
+    end
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
     expected = { 'gauges[0][name]'  => 'registry.one',
@@ -260,7 +335,12 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_write_counters
-    registry = stub_iterator([ 'registry', stub_iterator([ 'count', 1 ])])
+    metric = stub do
+      stubs(:each).yields([ 'count', 1 ])
+    end
+    registry = stub do
+      stubs(:each).yields([ 'registry', metric ])
+    end
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
     expected = { 'counters[0][type]' => 'counter' }
@@ -270,9 +350,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
 
   def test_write_records_times_once_per_metric
     Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42).twice
-    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
-                             [ 'registry', stub_iterator([ 'two',   2.2 ],
-                                                         [ 'three', 3.3 ]) ])
+    metric_one = stub do
+      stubs(:each).yields([ 'one', 1.1 ])
+    end
+    metric_two = stub do
+      stubs(:each).multiple_yields([ 'two',   2.2 ],
+                                   [ 'three', 3.3 ])
+    end
+    registry = stub do
+      stubs(:each).multiple_yields([ 'registry', metric_one ],
+                                   [ 'registry', metric_two ])
+    end
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                      :registry => registry)
     reporter.expects(:submit)
