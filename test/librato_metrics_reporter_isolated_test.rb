@@ -189,6 +189,20 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
 
   ### Public Methods
 
+  def test_stop
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                    :interval => 0.001)
+    reporter.start
+    reporter.stop
+    reporter.expects(:write).never
+    sleep 0.01
+  end
+
+  def test_stop_unstarted_reporter
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password')
+    assert_nothing_raised { reporter.stop }
+  end
+
   # TODO: This tests too much.
   def test_write_several_metrics
     Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42)
