@@ -187,6 +187,42 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.write
   end
 
+  def test_on_error_option
+    handler = stub
+    handler.expects(:[]).with(kind_of(RuntimeError)).at_least_once
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                    :interval => 0.001,
+                                                    :on_error => handler)
+    def reporter.write() raise('write') end
+
+    reporter.start
+    sleep 0.01
+    reporter.stop
+  end
+
+  def test_on_error_option_swallows_handler_errors
+    handler = stub
+    handler.expects(:[]).raises(StandardError).at_least_once
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                    :interval => 0.001,
+                                                    :on_error => handler)
+    def reporter.write() raise('write') end
+
+    reporter.start
+    sleep 0.01
+    reporter.stop
+  end
+
+  def test_default_on_error_option_swallows_errors
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                    :interval => 0.001)
+    def reporter.write() raise('write') end
+
+    reporter.start
+    sleep 0.01
+    reporter.stop
+  end
+
   ### Public Methods
 
   def test_stop

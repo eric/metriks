@@ -17,7 +17,7 @@ module Metriks::Reporter
       @interval     = options[:interval]
       @only         = options[:only]
       @except       = options[:except]
-      @on_error     = options[:on_error] || proc { |ex| }
+      @on_error     = options[:on_error]
       @time_tracker = Metriks::TimeTracker.new @interval
     end
 
@@ -25,7 +25,8 @@ module Metriks::Reporter
       { :interval => 60,
         :registry => Metriks::Registry.default,
         :only     => :all,
-        :except   => :none }
+        :except   => :none,
+        :on_error => proc { |ex| }}
     end
 
     def start
