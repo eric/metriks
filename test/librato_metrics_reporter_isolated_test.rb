@@ -17,7 +17,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
 
   ### Options
 
-  def test_prefix_option
+  def test_prefix_metric_names
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :prefix   => 'prefix',
                                          :registry => simple_registry)
@@ -27,7 +27,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     assert_equal 'prefix', reporter.prefix
   end
 
-  def test_default_prefix_option
+  def test_default_prefix_is_blank
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => simple_registry)
     reporter.expects(:submit).
@@ -36,7 +36,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     assert_nil reporter.prefix
   end
 
-  def test_source_option
+  def test_specify_source
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :source   => 'source',
                                          :registry => simple_registry)
@@ -46,7 +46,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     assert_equal 'source', reporter.source
   end
 
-  def test_default_source_option
+  def test_default_source_is_omitted
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => simple_registry)
     reporter.expects(:submit).with(Not(has_key('counters[0][source]')))
@@ -54,7 +54,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     assert_nil reporter.source
   end
 
-  def test_registry_option
+  def test_specify_registry
     registry = stub
     registry.expects(:each)
     reporter = Metriks::Reporter::LibratoMetrics.
@@ -62,7 +62,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.write
   end
 
-  def test_default_registry_option
+  def test_uses_default_registry
     registry = stub
     registry.expects(:each)
     Metriks::Registry.expects(:default).returns(registry)
@@ -71,17 +71,17 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
 
   # TODO: These tests don't really test the interval. Tie them in with #start
   # tests when written.
-  def test_interval_option
+  def test_specify_interval
     Metriks::TimeTracker.expects(:new).with(42)
     Metriks::Reporter::LibratoMetrics.new('user', 'password', :interval => 42)
   end
 
-  def test_default_interval_option
+  def test_default_interval_one_minute
     Metriks::TimeTracker.expects(:new).with(60)
     Metriks::Reporter::LibratoMetrics.new('user', 'password')
   end
 
-  def test_only_option
+  def test_report_only_matching_metric
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
                                                          [ 'three', 3.3 ]) ])
@@ -108,7 +108,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.write
   end
 
-  def test_only_option_with_multiple_matchers
+  def test_report_only_several_matching_metric
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
                                                          [ 'three', 3.3 ]) ])
@@ -161,7 +161,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.write
   end
 
-  def test_except_option_with_multiple_matchers
+  def test_report_except_several_matching_metric
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
                                                          [ 'three', 3.3 ]) ])
@@ -187,7 +187,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.write
   end
 
-  def test_on_error_option
+  def test_specify_error_handler
     handler = stub
     handler.expects(:[]).with(kind_of(RuntimeError)).at_least_once
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
@@ -200,7 +200,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.stop
   end
 
-  def test_on_error_option_swallows_handler_errors
+  def test_swallows_errors_raised_in_error_handler
     handler = stub
     handler.expects(:[]).raises(RuntimeError).at_least_once
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
@@ -213,7 +213,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.stop
   end
 
-  def test_default_on_error_option_swallows_errors
+  def test_default_error_handler_swallows_errors
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                     :interval => 0.001)
     def reporter.write() raise('write') end
