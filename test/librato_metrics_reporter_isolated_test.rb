@@ -85,26 +85,15 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
                                                          [ 'three', 3.3 ]) ])
-    matcher = stub
-    matcher.expects(:===).with('registry.one').returns(true)
-    matcher.expects(:===).with('registry.two').returns(false)
-    matcher.expects(:===).with('registry.three').returns(true)
-
-    expected = { 'gauges[0][name]' => 'registry.one',
-                 'gauges[1][name]' => 'registry.three' }
-
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
-                                         :only     => [matcher])
+                                         :only     => ['registry.one'])
     reporter.expects(:submit).with do |data|
-      has_expected = expected.all? do |key, value|
-        data.has_key?(key) && data[key] == value
-      end
-      has_no_extra_keys = !data.has_key?('gauges[2][name]')
-
-      has_expected && has_no_extra_keys
+      data.has_key?('gauges[0][name]')    &&
+        !data.has_key?('gauges[1][name]') &&
+        !data.has_key?('gauges[2][name]') &&
+        data['gauges[0][name]'] == 'registry.one'
     end
-
     reporter.write
   end
 
@@ -112,52 +101,48 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
                                                          [ 'three', 3.3 ]) ])
-    matcher_one = stub :=== => false
-    matcher_one.expects(:===).with('registry.one').returns(true)
-
-    matcher_two = stub :=== => false
-    matcher_two.expects(:===).with('registry.two').returns(true)
-
-    expected = { 'gauges[0][name]' => 'registry.one',
-                 'gauges[1][name]' => 'registry.two' }
-
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
-                                         :only     => [matcher_one, matcher_two])
+                                         :only     => %w( registry.one
+                                                          registry.three ))
     reporter.expects(:submit).with do |data|
-      has_expected = expected.all? do |key, value|
-        data.has_key?(key) && data[key] == value
-      end
-      has_no_extra_keys = !data.has_key?('gauges[2][name]')
-
-      has_expected && has_no_extra_keys
+      data.has_key?('gauges[0][name]')    &&
+        data.has_key?('gauges[1][name]')  &&
+        !data.has_key?('gauges[2][name]') &&
+        data['gauges[0][name]'] == 'registry.one' &&
+        data['gauges[1][name]'] == 'registry.three'
     end
-
     reporter.write
   end
 
-  def test_except_option
+  def test_only_matches_using_threequals_operator
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
                                                          [ 'three', 3.3 ]) ])
     matcher = stub
-    matcher.expects(:===).with('registry.one').returns(true)
-    matcher.expects(:===).with('registry.two').returns(false)
-    matcher.expects(:===).with('registry.three').returns(true)
-
-    expected = { 'gauges[0][name]' => 'registry.two' }
+    matcher.expects(:===).with('registry.one')
+    matcher.expects(:===).with('registry.two')
+    matcher.expects(:===).with('registry.three')
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
-                                         :except   => [matcher])
+                                         :only     => [matcher])
+    reporter.write
+  end
+
+  def test_report_except_matching_metric
+    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
+                             [ 'registry', stub_iterator([ 'two',   2.2 ],
+                                                         [ 'three', 3.3 ]) ])
+    reporter = Metriks::Reporter::LibratoMetrics.
+                 new('user', 'password', :registry => registry,
+                                         :except   => ['registry.one'])
     reporter.expects(:submit).with do |data|
-      has_expected = expected.all? do |key, value|
-        data.has_key?(key) && data[key] == value
-      end
-      has_no_extra_keys = !data.has_key?('gauges[1][name]')
-
-      has_expected && has_no_extra_keys
+      data.has_key?('gauges[0][name]')    &&
+        data.has_key?('gauges[1][name]')  &&
+        !data.has_key?('gauges[2][name]') &&
+        data['gauges[0][name]'] == 'registry.two' &&
+        data['gauges[1][name]'] == 'registry.three'
     end
-
     reporter.write
   end
 
@@ -165,25 +150,31 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
                              [ 'registry', stub_iterator([ 'two',   2.2 ],
                                                          [ 'three', 3.3 ]) ])
-    matcher_one = stub :=== => false
-    matcher_one.expects(:===).with('registry.one').returns(true)
-
-    matcher_two = stub :=== => false
-    matcher_two.expects(:===).with('registry.two').returns(true)
-
-    expected = { 'gauges[0][name]' => 'registry.three' }
     reporter = Metriks::Reporter::LibratoMetrics.
                  new('user', 'password', :registry => registry,
-                                         :except   => [matcher_one, matcher_two])
+                                         :except   => %w( registry.one
+                                                          registry.three ))
     reporter.expects(:submit).with do |data|
-      has_expected = expected.all? do |key, value|
-        data.has_key?(key) && data[key] == value
-      end
-      has_no_extra_keys = !data.has_key?('gauges[1][name]')
-
-      has_expected && has_no_extra_keys
+      data.has_key?('gauges[0][name]')    &&
+        !data.has_key?('gauges[1][name]') &&
+        !data.has_key?('gauges[2][name]') &&
+        data['gauges[0][name]'] == 'registry.two'
     end
+    reporter.write
+  end
 
+  def test_except_matches_using_threequals_operator
+    registry = stub_iterator([ 'registry', stub_iterator([ 'one',   1.1 ])],
+                             [ 'registry', stub_iterator([ 'two',   2.2 ],
+                                                         [ 'three', 3.3 ]) ])
+    matcher = stub
+    matcher.expects(:===).with('registry.one')
+    matcher.expects(:===).with('registry.two')
+    matcher.expects(:===).with('registry.three')
+    reporter = Metriks::Reporter::LibratoMetrics.
+                 new('user', 'password', :registry => registry,
+                                         :except   => [matcher])
+    reporter.stubs(:submit)
     reporter.write
   end
 
