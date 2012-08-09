@@ -202,7 +202,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
 
   def test_on_error_option_swallows_handler_errors
     handler = stub
-    handler.expects(:[]).raises(StandardError).at_least_once
+    handler.expects(:[]).raises(RuntimeError).at_least_once
     reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
                                                     :interval => 0.001,
                                                     :on_error => handler)
