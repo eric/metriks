@@ -24,6 +24,10 @@ module Metriks
       @variance = Atomic.new([ -1, 0 ])
     end
 
+    def type
+      'histogram'
+    end
+
     def clear
       @sample.clear
       @count.value = 0

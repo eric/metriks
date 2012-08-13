@@ -9,6 +9,13 @@ module Metriks
       @count = Atomic.new(0)
     end
 
+    # Public: The type of this metric.
+    #
+    # Returns the metric's type.
+    def type
+      'counter'
+    end
+
     # Public: Reset the counter back to 0
     #
     # Returns nothing.

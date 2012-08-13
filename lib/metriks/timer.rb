@@ -27,6 +27,10 @@ module Metriks
       @histogram = histogram
     end
 
+    def type
+      'timer'
+    end
+
     def clear
       @meter.clear
       @histogram.clear

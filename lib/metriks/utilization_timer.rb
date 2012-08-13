@@ -7,6 +7,10 @@ module Metriks
       @duration_meter = Metriks::Meter.new
     end
 
+    def type
+      'utilization_timer'
+    end
+
     def clear
       super
       @duration_meter.clear

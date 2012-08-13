@@ -20,6 +20,10 @@ module Metriks
       end
     end
 
+    def type
+      'meter'
+    end
+
     def clear
       @count.value = 0
       @start_time = Time.now
