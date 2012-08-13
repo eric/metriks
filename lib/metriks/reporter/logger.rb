@@ -55,28 +55,19 @@ module Metriks::Reporter
 
     def log_metric(name, metric, time)
       message = []
-
       message << @prefix if @prefix
-      message << { :time => time }
-
-      message << { :name => name }
-      message << { :type => metric.type }
-
+      message << format_data('time', time)
+      message << format_data('name', name)
+      message << format_data('type', metric.type)
       metric.each do |name, value|
-        message << { name => value }
+        message << format_data(name, value)
       end
 
-      @logger.add(@log_level, format_message(message))
+      @logger.add(@log_level, message.join(' '))
     end
 
-    def format_message(args)
-      args.map do |arg|
-        case arg
-        when Hash then arg.map { |name, value| "#{name}=#{format_message([value])}" }
-        when Array then format_message(arg)
-        else arg
-        end
-      end.join(' ')
+    def format_data(name, value)
+      [ name, value ].join('=')
     end
   end
 end
