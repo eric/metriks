@@ -1,4 +1,5 @@
 require 'socket'
+require 'metriks/time_tracker'
 
 module Metriks::Reporter
   class Graphite
