@@ -1,25 +1,28 @@
+require 'metriks/registry'
+require 'metriks/time_tracker'
+require 'riemann/client'
+
 module Metriks::Reporter
   class Riemann
-    require 'riemann/client'
-
     attr_accessor :client
+
     def initialize(options = {})
-      @client = ::Riemann::Client.new(
-        :host => options[:host],
-        :port => options[:port]
-      )
-      @registry = options[:registry] || Metrics::Registry.default
-      @interval = options[:interval] || 60
-      @on_error = options[:on_error] || proc { |ex| }
-      
+      @client = ::Riemann::Client.new :host => options[:host],
+                                      :port => options[:port]
+
+      interval = options[:interval] || 60
       @default_event = options[:default_event] || {}
-      @default_event[:ttl] ||= @interval * 1.5
+      @default_event[:ttl] ||= interval * 1.5
+
+      @time_tracker = Metriks::TimeTracker.new(interval)
+      @registry     = options[:registry] || Metriks::Registry.default
+      @on_error     = options[:on_error] || proc { |ex| }
     end
 
     def start
       @thread ||= Thread.new do
         loop do
-          sleep @interval
+          @time_tracker.sleep
           
           Thread.new do
             begin
@@ -53,11 +56,9 @@ module Metriks::Reporter
       @last_write = Time.now
       @registry.each do |name, metric|
         metric.each do |key, value|
-          @client << @default_event.merge(
-            :service => "#{name} #{key}",
-            :metric => value,
-            :tags => [metric.type]
-          )
+          @client << @default_event.merge(:service => "#{ name } #{ key }",
+                                          :metric  => value,
+                                          :tags    => [metric.type])
         end
       end
     end
