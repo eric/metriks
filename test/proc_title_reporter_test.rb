@@ -13,12 +13,12 @@ class ProcTitleReporterTest < Test::Unit::TestCase
     $0 = @original_proctitle
   end
 
-  def test_generate_title
+  def test_title
     @reporter.add 'test', 'sec' do
       50.333
     end
 
-    title = @reporter.send(:generate_title)
+    title = @reporter.send(:title)
 
     assert_equal 'test: 50.3/sec', title
   end
