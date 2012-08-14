@@ -1,19 +1,19 @@
 require 'socket'
+require 'metriks/registry'
 require 'metriks/time_tracker'
 
 module Metriks::Reporter
   class Graphite
-    attr_reader :host, :port
+    attr_accessor :host, :port, :prefix
 
     def initialize(host, port, options = {})
-      @host = host
-      @port = port
-
+      @host   = host
+      @port   = port
       @prefix = options[:prefix]
 
-      @registry  = options[:registry] || Metriks::Registry.default
-      @interval  = options[:interval] || 60
-      @on_error  = options[:on_error] || proc { |ex| }
+      @registry     = options[:registry] || Metriks::Registry.default
+      @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
+      @on_error     = options[:on_error] || proc { |ex| }
     end
 
     def socket
@@ -24,7 +24,7 @@ module Metriks::Reporter
     def start
       @thread ||= Thread.new do
         loop do
-          sleep @interval
+          @time_tracker.sleep
 
           Thread.new do
             begin
