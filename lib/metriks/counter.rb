@@ -48,6 +48,15 @@ module Metriks
       @count.value
     end
 
+    # Public: Iterate over all of the metrics.
+    #
+    # Examples
+    #
+    #   counter.each do |name, value|
+    #     puts "#{ name } = #{ value }"
+    #   end
+    #
+    # Returns nothing.
     def each(&block)
       yield 'count', count
     end
