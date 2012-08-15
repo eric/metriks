@@ -1,9 +1,10 @@
+require 'metriks/reporter'
 require 'metriks/registry'
 require 'metriks/time_tracker'
 require 'riemann/client'
 
-module Metriks::Reporter
-  class Riemann
+class Metriks::Reporter
+  class Riemann < Metriks::Reporter
     attr_accessor :client
 
     def initialize(options = {})
@@ -14,35 +15,7 @@ module Metriks::Reporter
       @default_event = options[:default_event] || {}
       @default_event[:ttl] ||= interval * 1.5
 
-      @time_tracker = Metriks::TimeTracker.new(interval)
-      @registry     = options[:registry] || Metriks::Registry.default
-      @on_error     = options[:on_error] || proc { |ex| }
-    end
-
-    def start
-      @thread ||= Thread.new do
-        loop do
-          @time_tracker.sleep
-          
-          Thread.new do
-            begin
-              write
-            rescue Exception => ex
-              @on_error[ex] rescue nil
-            end
-          end
-        end
-      end
-    end
-
-    def stop
-      @thread.kill if @thread
-      @thread = nil
-    end
-
-    def restart
-      stop
-      start
+      super options
     end
 
     def flush

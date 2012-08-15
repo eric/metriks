@@ -1,16 +1,16 @@
+require 'metriks/reporter'
 require 'metriks/registry'
 require 'metriks/time_tracker'
 
-module Metriks::Reporter
-  class ProcTitle
+class Metriks::Reporter
+  class ProcTitle < Metriks::Reporter
     def initialize(options = {})
       @rounding = options[:rounding] || 1
       @prefix = options[:prefix] || $0
 
-      @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
-      @on_error     = options[:on_error] || proc { |ex| }
-
       @metrics = []
+
+      super options
     end
 
     def add(name, suffix = nil, &block)
@@ -33,16 +33,6 @@ module Metriks::Reporter
           @time_tracker.sleep
         end
       end
-    end
-
-    def stop
-      @thread.kill if @thread
-      @thread = nil
-    end
-
-    def restart
-      stop
-      start
     end
 
     def write

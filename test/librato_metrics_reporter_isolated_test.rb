@@ -68,33 +68,6 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     assert_nil reporter.source
   end
 
-  def test_specify_registry
-    registry = stub
-    registry.expects(:each)
-    reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :registry => registry)
-    reporter.write
-  end
-
-  def test_uses_default_registry
-    registry = stub
-    registry.expects(:each)
-    Metriks::Registry.expects(:default).returns(registry)
-    Metriks::Reporter::LibratoMetrics.new('user', 'password').write
-  end
-
-  # TODO: These tests don't really test the interval. Tie them in with #start
-  # tests when written.
-  def test_specify_interval
-    Metriks::TimeTracker.expects(:new).with(42)
-    Metriks::Reporter::LibratoMetrics.new('user', 'password', :interval => 42)
-  end
-
-  def test_default_interval_one_minute
-    Metriks::TimeTracker.expects(:new).with(60)
-    Metriks::Reporter::LibratoMetrics.new('user', 'password')
-  end
-
   def test_report_only_matching_metric
     metric_one = stub do
       stubs(:each).yields([ 'one', 1.1 ])
@@ -240,57 +213,7 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     reporter.write
   end
 
-  def test_specify_error_handler
-    Metriks::TimeTracker.any_instance.stubs(:sleep)
-    handler = stub
-    handler.expects(:[]).with(kind_of(RuntimeError)).at_least_once
-    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
-                                                     :on_error => handler)
-    def reporter.write() raise('write') end
-
-    reporter.start
-    sleep 0.01
-    reporter.stop
-  end
-
-  def test_swallows_errors_raised_in_error_handler
-    Metriks::TimeTracker.any_instance.stubs(:sleep)
-    handler = stub
-    handler.expects(:[]).raises(RuntimeError).at_least_once
-    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
-                                                     :on_error => handler)
-    def reporter.write() raise('write') end
-
-    reporter.start
-    sleep 0.01
-    reporter.stop
-  end
-
-  def test_default_error_handler_swallows_errors
-    Metriks::TimeTracker.any_instance.stubs(:sleep)
-    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password')
-    def reporter.write() raise('write') end
-
-    reporter.start
-    sleep 0.01
-    reporter.stop
-  end
-
   ### Public Methods
-
-  def test_stop
-    Metriks::TimeTracker.any_instance.stubs(:sleep)
-    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password')
-    reporter.start
-    reporter.stop
-    reporter.expects(:write).never
-    sleep 0.01
-  end
-
-  def test_stop_unstarted_reporter
-    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password')
-    assert_nothing_raised { reporter.stop }
-  end
 
   def test_write
     Metriks::TimeTracker.any_instance.stubs(:now_floored).returns(42)
