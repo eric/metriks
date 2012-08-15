@@ -7,12 +7,6 @@ Thread.abort_on_exception = true
 class GraphiteReporterIsolatedTest < Test::Unit::TestCase
   ### Options
 
-  def test_specify_connection_details
-    reporter = Metriks::Reporter::Graphite.new('localhost', 8080)
-    assert_equal 'localhost', reporter.host
-    assert_equal 8080, reporter.port
-  end
-
   def test_assign_connection_details
     reporter = Metriks::Reporter::Graphite.new('localhost', 8080)
     reporter.host = 'remotehost'
@@ -30,6 +24,8 @@ class GraphiteReporterIsolatedTest < Test::Unit::TestCase
     end
     reporter = Metriks::Reporter::Graphite.new('localhost', 8080,
                                                :registry => registry)
+    assert_equal 'localhost', reporter.host
+    assert_equal 8080, reporter.port
     socket = stub { stubs(:write) }
     TCPSocket.expects(:new).with('localhost', 8080).returns(socket)
     reporter.write
@@ -66,7 +62,6 @@ class GraphiteReporterIsolatedTest < Test::Unit::TestCase
     end
     TCPSocket.stubs(:new).with('localhost', 8080).returns(socket)
     reporter.write
-
     socket.stubs(:closed?).returns(true)
     new_socket = stub do
       expects(:write).once
@@ -75,34 +70,29 @@ class GraphiteReporterIsolatedTest < Test::Unit::TestCase
     reporter.write
   end
 
-  def test_specify_prefix
-    reporter = Metriks::Reporter::Graphite.new('localhost', 8080,
-                                               :prefix => 'prefix')
-    assert_equal 'prefix', reporter.prefix
-  end
-
-  def test_no_default_prefix
+  def test_no_prefix_by_default
     reporter = Metriks::Reporter::Graphite.new('localhost', 8080)
     assert_nil reporter.prefix
   end
 
-  def test_assign_prefix
+  def test_prefix_accessor
     reporter = Metriks::Reporter::Graphite.new('localhost', 8080)
     reporter.prefix = 'prefix'
     assert_equal 'prefix', reporter.prefix
   end
 
-  def test_use_prefix
-    Time.stubs(:now => 42)
+  def test_specify_prefix
     metric = stub do
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
       stubs(:each).yields('testing', metric)
     end
+    Time.stubs(:now => 42)
     reporter = Metriks::Reporter::Graphite.new('localhost', 8080,
                                                :registry => registry,
                                                :prefix   => 'prefix')
+    assert_equal 'prefix', reporter.prefix
     socket = stub do
       expects(:write).with("prefix.testing.count 1 42\n")
     end
@@ -113,13 +103,13 @@ class GraphiteReporterIsolatedTest < Test::Unit::TestCase
   ### Public Methods
 
   def test_write
-    Time.stubs(:now => 42)
     metric = stub do
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
       stubs(:each).yields('testing', metric)
     end
+    Time.stubs(:now => 42)
     reporter = Metriks::Reporter::Graphite.new('localhost', 8080,
                                                :registry => registry)
     socket = stub do
@@ -130,7 +120,6 @@ class GraphiteReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_writes_multiple_metrics
-    Time.stubs(:now => 42)
     logger = stub :logger
     metric_one = stub do
       stubs(:each).yields([ 'one', 1.1 ])
@@ -143,6 +132,7 @@ class GraphiteReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).multiple_yields([ 'metric_one', metric_one ],
                                    [ 'metric_two', metric_two ])
     end
+    Time.stubs(:now => 42)
     reporter = Metriks::Reporter::Graphite.new('localhost', 8080,
                                                :registry => registry)
     socket = stub do

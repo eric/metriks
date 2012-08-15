@@ -7,16 +7,6 @@ Thread.abort_on_exception = true
 class RiemannReporterIsolatedTest < Test::Unit::TestCase
   ### Options
 
-  def test_specify_connection_details
-    client = stub
-    Riemann::Client.expects(:new).
-      with(:host => 'localhost', :port => 8080).
-      returns(client)
-    reporter = Metriks::Reporter::Riemann.new(:host => 'localhost',
-                                              :port => 8080)
-    assert_equal client, reporter.client
-  end
-
   def test_assign_client
     reporter = Metriks::Reporter::Riemann.new(:host => 'localhost',
                                               :port => 8080)
@@ -34,10 +24,13 @@ class RiemannReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).yields('testing', metric)
     end
     client = stub { expects(:<<) }
-    Riemann::Client.stubs(:new).returns(client)
+    Riemann::Client.expects(:new).
+      with(:host => 'localhost', :port => 8080).
+      returns(client)
     reporter = Metriks::Reporter::Riemann.new(:host     => 'localhost',
                                               :port     => 8080,
                                               :registry => registry)
+    assert_equal client, reporter.client
     reporter.write
   end
 
@@ -81,7 +74,6 @@ class RiemannReporterIsolatedTest < Test::Unit::TestCase
   ### Public Methods
 
   def test_write
-    Time.stubs(:now => 42)
     metric = stub do
       stubs :type => 'counter'
       stubs(:each).yields([ 'count', 1 ])
@@ -105,7 +97,6 @@ class RiemannReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_writes_multiple_metrics
-    Time.stubs(:now => 42)
     metric_one = stub do
       stubs :type => 'one'
       stubs(:each).yields([ 'one', 1.1 ])

@@ -15,18 +15,18 @@ class ProcTitleReporterIsolatedTest < Test::Unit::TestCase
 
   ### Options
 
+  def test_round_to_one_decimal_place_and_use_proctitle_as_prefix_by_default
+    reporter = Metriks::Reporter::ProcTitle.new
+    reporter.add('pi') { 3.1415926	}
+    reporter.write
+    assert_equal "#{ @original_proctitle } pi: 3.1", $0
+  end
+
   def test_specify_rounding
     reporter = Metriks::Reporter::ProcTitle.new :rounding => 2
     reporter.add('pi') { 3.1415926	}
     reporter.write
     assert_equal "#{ @original_proctitle } pi: 3.14", $0
-  end
-
-  def test_default_rounding
-    reporter = Metriks::Reporter::ProcTitle.new
-    reporter.add('pi') { 3.1415926	}
-    reporter.write
-    assert_equal "#{ @original_proctitle } pi: 3.1", $0
   end
 
   def test_ignore_rounding_for_non_floats
@@ -41,13 +41,6 @@ class ProcTitleReporterIsolatedTest < Test::Unit::TestCase
     reporter.add('counter') { 1 }
     reporter.write
     assert_equal 'metriks! counter: 1', $0
-  end
-
-  def test_use_proctitle_for_default_prefix
-    reporter = Metriks::Reporter::ProcTitle.new
-    reporter.add('counter') { 1 }
-    reporter.write
-    assert_equal "#{ @original_proctitle } counter: 1", $0
   end
 
   ### Public Methods

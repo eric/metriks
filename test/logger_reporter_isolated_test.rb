@@ -29,7 +29,7 @@ class LoggerReporterIsolatedTest < Test::Unit::TestCase
     assert_equal logger, reporter.logger
   end
 
-  def test_default_logger_uses_stdout
+  def test_log_to_stdout_by_default
     logger = stub :logger
     ::Logger.expects(:new).with(STDOUT).returns(logger)
     reporter = Metriks::Reporter::Logger.new
@@ -44,8 +44,6 @@ class LoggerReporterIsolatedTest < Test::Unit::TestCase
   end
 
   def test_use_logger_and_log_level
-    log_level = stub :log_level
-    logger    = stub :logger
     metric = stub do
       stubs :type => 'counter'
       stubs(:each).yields([ 'count', 1 ])
@@ -53,21 +51,13 @@ class LoggerReporterIsolatedTest < Test::Unit::TestCase
     registry = stub do
       stubs(:each).yields('testing', metric)
     end
-    reporter = Metriks::Reporter::Logger.new(:logger    => logger,
-                                             :registry  => registry,
-                                             :log_level => log_level)
+    log_level = stub :log_level
+    logger    = stub :logger
+    reporter  = Metriks::Reporter::Logger.new(:logger    => logger,
+                                              :registry  => registry,
+                                              :log_level => log_level)
     logger.expects(:add).with(log_level, kind_of(String))
     reporter.write
-  end
-
-  def test_specify_prefix
-    reporter = Metriks::Reporter::Logger.new(:prefix => 'prefix')
-    assert_equal 'prefix', reporter.prefix
-  end
-
-  def test_default_prefix
-    reporter = Metriks::Reporter::Logger.new
-    assert_equal 'metriks:', reporter.prefix
   end
 
   def test_assign_prefix
@@ -76,8 +66,12 @@ class LoggerReporterIsolatedTest < Test::Unit::TestCase
     assert_equal 'prefix', reporter.prefix
   end
 
-  def test_use_prefix
-    logger = stub :logger
+  def test_default_prefix
+    reporter = Metriks::Reporter::Logger.new
+    assert_equal 'metriks:', reporter.prefix
+  end
+
+  def test_specify_prefix
     metric = stub do
       stubs :type => 'counter'
       stubs(:each).yields([ 'count', 1 ])
@@ -85,9 +79,11 @@ class LoggerReporterIsolatedTest < Test::Unit::TestCase
     registry = stub do
       stubs(:each).yields('testing', metric)
     end
+    logger   = stub :logger
     reporter = Metriks::Reporter::Logger.new(:logger   => logger,
                                              :registry => registry,
                                              :prefix   => 'prefix')
+    assert_equal 'prefix', reporter.prefix
     logger.expects(:add).with do |_, message|
       assert message.start_with?('prefix')
     end
@@ -96,27 +92,8 @@ class LoggerReporterIsolatedTest < Test::Unit::TestCase
 
   ### Public Methods
 
-  def test_write_includes_time
-    Time.stubs(:now => 42)
-    logger = stub :logger
-    metric = stub do
-      stubs :type => 'counter'
-      stubs(:each).yields([ 'count', 1 ])
-    end
-    registry = stub do
-      stubs(:each).yields('testing', metric)
-    end
-    reporter = Metriks::Reporter::Logger.new(:logger   => logger,
-                                             :registry => registry)
-    logger.expects(:add).with do |_, message|
-      assert_match /\btime=42\b/, message
-    end
-    reporter.write
-  end
-
   def test_write_includes_metric
     Time.stubs(:now => 42)
-    logger = stub :logger
     metric = stub do
       stubs :type => 'counter'
       stubs(:each).yields([ 'count', 1 ])
@@ -124,17 +101,15 @@ class LoggerReporterIsolatedTest < Test::Unit::TestCase
     registry = stub do
       stubs(:each).yields('testing', metric)
     end
+    logger   = stub :logger
     reporter = Metriks::Reporter::Logger.new(:logger   => logger,
                                              :registry => registry)
-
     expected = 'metriks: time=42 name=testing type=counter count=1'
     logger.expects(:add).with(kind_of(Fixnum), expected)
     reporter.write
   end
 
   def test_writes_multiple_metrics
-    Time.stubs(:now => 42)
-    logger = stub :logger
     metric_one = stub do
       stubs :type => 'one'
       stubs(:each).yields([ 'one', 1.1 ])
@@ -148,12 +123,14 @@ class LoggerReporterIsolatedTest < Test::Unit::TestCase
       stubs(:each).multiple_yields([ 'metric_one', metric_one ],
                                    [ 'metric_two', metric_two ])
     end
+    Time.stubs(:now => 42)
+    logger   = stub :logger
     reporter = Metriks::Reporter::Logger.new(:logger   => logger,
                                              :registry => registry)
-    expected = 'metriks: time=42 name=metric_one type=one one=1.1'
-    logger.expects(:add).with(kind_of(Fixnum), expected)
-    expected = 'metriks: time=42 name=metric_two type=two two=2.2 three=3.3'
-    logger.expects(:add).with(kind_of(Fixnum), expected)
+    metric_one_expected = 'metriks: time=42 name=metric_one type=one one=1.1'
+    logger.expects(:add).with(kind_of(Fixnum), metric_one_expected)
+    metric_two_expected = 'metriks: time=42 name=metric_two type=two two=2.2 three=3.3'
+    logger.expects(:add).with(kind_of(Fixnum), metric_two_expected)
     reporter.write
   end
 

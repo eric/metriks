@@ -14,40 +14,40 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     registry = stub do
       stubs(:each).yields('counter', metric)
     end
-    reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :prefix   => 'prefix',
-                                         :registry => registry)
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :prefix   => 'prefix',
+                                                     :registry => registry)
     reporter.expects(:submit).
       with(has_entry('counters[0][name]' => 'prefix.counter.count'))
     reporter.write
     assert_equal 'prefix', reporter.prefix
   end
 
-  def test_default_prefix_is_blank
+  def test_no_prefix_by_default
     metric = stub do
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
       stubs(:each).yields('counter', metric)
     end
-    reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :registry => registry)
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :registry => registry)
     reporter.expects(:submit).
       with(has_entry('counters[0][name]' => 'counter.count'))
     reporter.write
     assert_nil reporter.prefix
   end
 
-  def test_specify_source
+  def test_record_source
     metric = stub do
       stubs(:each).yields([ 'count', 1 ])
     end
     registry = stub do
       stubs(:each).yields('counter', metric)
     end
-    reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :source   => 'source',
-                                         :registry => registry)
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :source   => 'source',
+                                                     :registry => registry)
     reporter.expects(:submit).
       with(has_entry('counters[0][source]' => 'source'))
     reporter.write
@@ -61,8 +61,8 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     registry = stub do
       stubs(:each).yields('counter', metric)
     end
-    reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :registry => registry)
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :registry => registry)
     reporter.expects(:submit).with(Not(has_key('counters[0][source]')))
     reporter.write
     assert_nil reporter.source
@@ -134,9 +134,9 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     matcher.expects(:===).with('metric_one.one')
     matcher.expects(:===).with('metric_two.two')
     matcher.expects(:===).with('metric_two.three')
-    reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :registry => registry,
-                                         :only     => [matcher])
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :registry => registry,
+                                                     :only     => [matcher])
     reporter.write
   end
 
@@ -206,9 +206,9 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     matcher.expects(:===).with('metric_one.one')
     matcher.expects(:===).with('metric_two.two')
     matcher.expects(:===).with('metric_two.three')
-    reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :registry => registry,
-                                         :except   => [matcher])
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :registry => registry,
+                                                     :except   => [matcher])
     reporter.stubs(:submit)
     reporter.write
   end
@@ -223,8 +223,8 @@ class LibratoMetricsReporterIsolatedTest < Test::Unit::TestCase
     registry = stub do
       stubs(:each).yields([ 'metric', metric ])
     end
-    reporter = Metriks::Reporter::LibratoMetrics.
-                 new('user', 'password', :registry => registry)
+    reporter = Metriks::Reporter::LibratoMetrics.new('user', 'password',
+                                                     :registry => registry)
     expected = { 'gauges[0][type]'         => 'gauge',
                  'gauges[0][name]'         => 'metric.one',
                  'gauges[0][measure_time]' => '42',
