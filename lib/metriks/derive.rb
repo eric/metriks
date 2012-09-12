@@ -1,6 +1,6 @@
 require 'atomic'
 
-require 'metriks/ewma'
+require 'metriks/meter'
 
 module Metriks
   class Derive < Metriks::Meter
