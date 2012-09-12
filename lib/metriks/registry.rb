@@ -2,6 +2,7 @@ require 'metriks/counter'
 require 'metriks/timer'
 require 'metriks/utilization_timer'
 require 'metriks/meter'
+require 'metriks/derive'
 
 module Metriks
   # Public: A collection of metrics
@@ -84,6 +85,21 @@ module Metriks
     # Returns the Metricks::Meter identified by the name.
     def meter(name)
       add_or_get(name, Metriks::Meter)
+    end
+
+    # Public: Fetch or create a new derivative metric. Derivatives are a meter
+    # that tracks throughput by calculating the derivative to the previous
+    # value.
+    #
+    # name - The String name of the metric to define or fetch
+    #
+    # Examples
+    #
+    #   registry.derive('network.bytes')
+    #
+    # Returns the Metricks::Derive identified by the name.
+    def derive(name)
+      add_or_get(name, Metriks::Derive)
     end
 
     # Public: Fetch or create a new timer metric. Timers provide the means to

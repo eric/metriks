@@ -1,4 +1,3 @@
-
 module Metriks
   VERSION = '0.9.9.1'
 
@@ -20,6 +19,10 @@ module Metriks
 
   def self.meter(name)
     Metriks::Registry.default.meter(name)
+  end
+
+  def self.derive(name)
+    Metriks::Registry.default.derive(name)
   end
 
   def self.histogram(name)
