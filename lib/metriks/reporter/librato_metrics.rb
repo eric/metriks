@@ -15,6 +15,12 @@ module Metriks::Reporter
       @registry  = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
       @on_error  = options[:on_error] || proc { |ex| }
+
+      if options[:only] and options[:except]
+        raise 'Can only specify one of :only or :except'
+      end
+      @only     = options[:only] || []
+      @except   = options[:except] || []
     end
 
     def start
@@ -43,7 +49,7 @@ module Metriks::Reporter
       start
     end
 
-    def write
+    def prepare_metrics
       gauges = []
       @registry.each do |name, metric|
         gauges << case metric
@@ -84,9 +90,13 @@ module Metriks::Reporter
       end
 
       gauges.flatten!
+      gauges
+    end
 
+    def write
+      gauges = prepare_metrics
       unless gauges.empty?
-        submit(form_data(gauges.flatten))
+        submit(form_data(gauges))
       end
     end
 
@@ -144,6 +154,15 @@ module Metriks::Reporter
       base_name = base_name.to_s.gsub(/ +/, '_')
       if @prefix
         base_name = "#{@prefix}.#{base_name}"
+      end
+
+      if @only.any?
+        keys = keys & @only
+        snapshot_keys = snapshot_keys & @only
+      end
+      if @except.any?
+        keys = keys - @except
+        snapshot_keys = snapshot_keys - @except
       end
 
       keys.flatten.each do |key|
