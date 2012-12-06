@@ -16,7 +16,16 @@ module Metriks
     # Public: Initializes a new Registry.
     def initialize
       @mutex = Mutex.new
+      @prefix = nil
       @metrics = {}
+    end
+
+    # Public: Set a prefix for all metric names. Useful for example when
+    # reporting from multiple applications.
+    #
+    # Returns prefix.
+    def set_prefix(prefix)
+      @prefix = prefix
     end
 
     # Public: Clear all of the metrics in the Registry. This ensures all
@@ -148,7 +157,7 @@ module Metriks
     # Returns the metric or nil.
     def get(name)
       @mutex.synchronize do
-        @metrics[name]
+        @metrics[name_with_prefix(name)]
       end
     end
 
@@ -165,10 +174,10 @@ module Metriks
     # Raises RuntimeError if the metric name is already defined
     def add(name, metric)
       @mutex.synchronize do
-        if @metrics[name]
-          raise "Metric '#{name}' already defined"
+        if @metrics[name_with_prefix(name)]
+          raise "Metric '#{name_with_prefix(name)}' already defined"
         else
-          @metrics[name] = metric
+          @metrics[name_with_prefix(name)] = metric
         end
       end
     end
@@ -176,16 +185,21 @@ module Metriks
     protected
     def add_or_get(name, klass, &create_metric)
       @mutex.synchronize do
-        if metric = @metrics[name]
+        if metric = @metrics[name_with_prefix(name)]
           if !metric.is_a?(klass)
             raise "Metric already defined as '#{metric.class}'"
           else
             return metric
           end
         else
-          @metrics[name] = create_metric ? create_metric.call : klass.new
+          @metrics[name_with_prefix(name)] = create_metric ? create_metric.call : klass.new
         end
       end
+    end
+
+    def name_with_prefix(name)
+      return name unless @prefix.is_a?(String) && @prefix.length>0
+      "#{@prefix}.#{name}"
     end
   end
 end

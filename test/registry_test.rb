@@ -46,4 +46,13 @@ class RegistryTest < Test::Unit::TestCase
   def test_default
     assert_not_nil Metriks::Registry.default
   end
+
+  def test_set_prefix
+    @registry.set_prefix('foo')
+    @registry.meter('bar').mark
+    metric_names = []
+    @registry.each {|name,metric|metric_names.push(name)}
+    assert_equal 1, metric_names.size
+    assert_equal 'foo.bar', metric_names.first
+  end
 end

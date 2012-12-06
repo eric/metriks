@@ -25,6 +25,10 @@ module Metriks
   def self.histogram(name)
     Metriks::Registry.default.histogram(name)
   end
+
+  def self.set_prefix(prefix)
+    Metriks::Registry.default.set_prefix(prefix)
+  end
 end
 
 require 'metriks/registry'
