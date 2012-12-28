@@ -1,5 +1,4 @@
 require 'atomic'
-require 'red_black_tree'
 require 'metriks/snapshot'
 
 module Metriks
@@ -7,7 +6,7 @@ module Metriks
     RESCALE_THRESHOLD = 60 * 60 # 1 hour
 
     def initialize(reservoir_size, alpha, values = nil)
-      @values = values || RedBlackTree.new
+      @values = values || Hash.new
       @count = Atomic.new(0)
       @next_scale_time = Atomic.new(0)
       @alpha = alpha

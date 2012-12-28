@@ -9,6 +9,8 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.rubygems_version = '1.3.5'
 
+  s.required_ruby_version = '>= 1.9'
+
   ## Leave these as is they will be modified for you by the rake gemspec task.
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
@@ -41,7 +43,6 @@ Gem::Specification.new do |s|
   ## that are needed for an end user to actually USE your code.
   s.add_dependency('atomic', ["~> 1.0"])
   s.add_dependency('hitimes', [ "~> 1.1"])
-  s.add_dependency('avl_tree', [ "~> 1.1.2" ])
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
