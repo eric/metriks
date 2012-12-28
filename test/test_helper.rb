@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'pp'
 
-require 'mocha'
+require 'mocha/setup'
 
 require 'metriks'
 
