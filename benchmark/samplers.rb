@@ -2,7 +2,6 @@
 
 require 'benchmark'
 require 'metriks'
-require 'rbtree'
 require 'avl_tree'
 require 'red_black_tree'
 
@@ -77,8 +76,8 @@ reporter = TimerBenchmarker.new(fib_times, iter)
 
 reporter.measure :uniform, Metriks::Timer.new(Metriks::Histogram.new_uniform)
 
-reporter.measure :exponential, Metriks::Timer.new(Metriks::ExponentiallyDecayingSample.new(
-  Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA, RBTree.new))
+reporter.measure :exponential_hash, Metriks::Timer.new(Metriks::ExponentiallyDecayingSample.new(
+  Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
 
 reporter.measure :exponential_avl, Metriks::Timer.new(Metriks::ExponentiallyDecayingSample.new(
   Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA, AVLTree.new))
