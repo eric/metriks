@@ -23,13 +23,11 @@ module Metriks::Reporter
 
     def initialize(options = {})
       raise "You must provide either :agent or :api_token as an option" unless options[:agent] || options[:api_token]
-      @agent = options[:agent] || ::Instrumental::Agent.new(options[:api_token])
-
-      @prefix = options[:prefix]
-
-      @registry  = options[:registry] || Metriks::Registry.default
+      @agent        = options[:agent] || ::Instrumental::Agent.new(options[:api_token])
+      @prefix       = options[:prefix]
+      @registry     = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
-      @on_error  = options[:on_error] || proc { |ex| }
+      @on_error     = options[:on_error] || proc { |ex| }
     end
 
     def start
