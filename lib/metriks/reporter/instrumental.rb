@@ -1,4 +1,6 @@
 require 'metriks/time_tracker'
+
+gem 'instrumental_agent'
 require 'instrumental_agent'
 
 module Metriks::Reporter
