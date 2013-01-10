@@ -33,4 +33,10 @@ class InstrumentalReporterTest < Test::Unit::TestCase
     @agent.expects(:increment).at_least(1)
     @reporter.write
   end
+
+  def test_invalid_arguments()
+    assert_raise(::RuntimeError) { Metriks::Reporter::Instrumental.new }
+    assert_nothing_thrown { Metriks::Reporter::Instrumental.new(:api_token => "TEST") }
+    assert_nothing_thrown { Metriks::Reporter::Instrumental.new(:agent => Instrumental::Agent.new("TEST", :enabled => false)) }
+  end
 end
