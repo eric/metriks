@@ -23,7 +23,7 @@ module Metriks::Reporter
 
     def initialize(options = {})
       raise "You must provide either :agent or :api_token as an option" unless options[:agent] || options[:api_token]
-      @agent = options[:agent] || Instrumental::Agent.new(options[:api_token], agent_options)
+      @agent = options[:agent] || ::Instrumental::Agent.new(options[:api_token])
 
       @prefix = options[:prefix]
 
