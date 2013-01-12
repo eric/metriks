@@ -63,7 +63,7 @@ module Metriks
     end
 
     def stddev
-      count > 0 ? variance : 0.0
+      count > 0 ? variance ** 0.5 : 0.0
     end
 
     def variance
