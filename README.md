@@ -334,6 +334,9 @@ will display:
 501      17015 26.0  1.9 416976 246956 ?       Ss   18:54  11:43 thin reqs: 273.3/sec
 ```
 
+# Application Server Configuration
+
+Depending on how your application server operates, you may need to configure how reporters are created. Please look at [Troubleshooting](https://github.com/eric/metriks/wiki/Troubleshooting) for more information.
 
 # Plans
 
