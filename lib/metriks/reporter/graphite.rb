@@ -108,6 +108,8 @@ module Metriks::Reporter
           socket.write("#{base_name}.#{name} #{value} #{time}\n")
         end
       end
+    rescue Errno::EPIPE
+      socket.close
     end
   end
 end
