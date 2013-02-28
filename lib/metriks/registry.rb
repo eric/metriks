@@ -67,7 +67,7 @@ module Metriks
     #
     #   registry.counter('method.calls')
     #
-    # Returns the Metricks::Counter identified by the name.
+    # Returns the Metriks::Counter identified by the name.
     def counter(name)
       add_or_get(name, Metriks::Counter)
     end
@@ -81,7 +81,7 @@ module Metriks
     #
     #   registry.meter('resque.calls')
     #
-    # Returns the Metricks::Meter identified by the name.
+    # Returns the Metriks::Meter identified by the name.
     def meter(name)
       add_or_get(name, Metriks::Meter)
     end
@@ -96,7 +96,7 @@ module Metriks
     #
     #   registry.timer('resque.worker')
     #
-    # Returns the Metricks::Timer identified by the name.
+    # Returns the Metriks::Timer identified by the name.
     def timer(name)
       add_or_get(name, Metriks::Timer)
     end
@@ -115,7 +115,7 @@ module Metriks
     #
     #   registry.utilization_timer('rack.utilization')
     #
-    # Returns the Metricks::UtilizationTimer identified by the name.
+    # Returns the Metriks::UtilizationTimer identified by the name.
     def utilization_timer(name)
       add_or_get(name, Metriks::UtilizationTimer)
     end
@@ -130,7 +130,7 @@ module Metriks
     #
     #   registry.histogram('backlog.wait')
     #
-    # Returns the Metricks::Histogram identified by the name.
+    # Returns the Metriks::Histogram identified by the name.
     def histogram(name)
       add_or_get(name, Metriks::Histogram) do
         Metriks::Histogram.new_exponentially_decaying
