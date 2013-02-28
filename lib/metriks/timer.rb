@@ -1,11 +1,14 @@
 require 'atomic'
 require 'hitimes'
 
+require 'metriks/exportable'
 require 'metriks/meter'
 require 'metriks/histogram'
 
 module Metriks
   class Timer
+    include Metriks::Exportable
+
     class Context
       def initialize(timer)
         @timer    = timer
@@ -96,6 +99,20 @@ module Metriks
 
     def stop
       @meter.stop
+    end
+
+    private
+    def exportable_metrics
+      [
+        :count, :min, :max, :mean, :stddev,
+        :one_minute_rate, :five_minute_rate, :fifteen_minute_rate, :mean_rate
+      ]
+    end
+
+    def exportable_snapshots
+      [
+        :median, :get_95th_percentile
+      ]
     end
   end
 end

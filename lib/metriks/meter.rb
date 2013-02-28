@@ -1,9 +1,12 @@
 require 'atomic'
 
 require 'metriks/ewma'
+require 'metriks/exportable'
 
 module Metriks
   class Meter
+    include Metriks::Exportable
+
     TICK_INTERVAL = 5.0
 
     def initialize(averager_klass = Metriks::EWMA)
@@ -80,6 +83,15 @@ module Metriks
     end
 
     def stop
+    end
+
+    private
+    def exportable_metrics
+      [
+        :count,
+        :one_minute_rate, :five_minute_rate, :fifteen_minute_rate,
+        :mean_rate
+      ]
     end
   end
 end
