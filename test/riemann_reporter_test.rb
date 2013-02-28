@@ -36,6 +36,7 @@ class RiemannReporterTest < Test::Unit::TestCase
     @registry.timer('timer.testing').update(1.5)
     @registry.histogram('histogram.testing').update(1.5)
     @registry.utilization_timer('utilization_timer.testing').update(1.5)
+    @registry.gauge('gauge.testing').set(123)
 
     @reporter.client.expects(:<<).at_least_once
     @reporter.client.expects(:<<).with(
@@ -71,6 +72,14 @@ class RiemannReporterTest < Test::Unit::TestCase
       :service => "utilization_timer.testing mean",
       :metric => 1.5,
       :tags => ["utilization_timer"],
+      :ttl => 90
+    )
+
+    @reporter.client.expects(:<<).with(
+      :host => "h",
+      :service => "gauge.testing value",
+      :metric => 123,
+      :tags => ["gauge"],
       :ttl => 90
     )
 

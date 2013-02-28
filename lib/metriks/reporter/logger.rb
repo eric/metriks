@@ -59,6 +59,10 @@ module Metriks::Reporter
           log_metric name, 'counter', metric, [
             :count
           ]
+        when Metriks::Gauge
+          log_metric name, 'gauge', metric, [
+            :value
+          ]
         when Metriks::UtilizationTimer
           log_metric name, 'utilization_timer', metric, [
             :count, :one_minute_rate, :five_minute_rate,
