@@ -56,6 +56,28 @@ Return the current value of the counter.
   puts "counter: #{counter.count}"
 ```
 
+## Gauges
+
+A gauge is an instantaneous measurement of a value.
+
+### set(val)
+
+Set the current value.
+
+``` ruby
+  gauge = Metriks.gauge('queue_size')
+  gauge.set(queue.size)
+```
+
+### value()
+
+Returns the value.
+
+``` ruby
+  gauge = Metriks.gauge('queue_size')
+  puts "queue size: #{gauge.value}"
+```
+
 ## Meters
 
 A meter that measures the mean throughput and the one-, five-, and
