@@ -10,6 +10,10 @@ module Metriks
     Metriks::Registry.default.counter(name)
   end
 
+  def self.gauge(name)
+    Metriks::Registry.default.gauge(name)
+  end
+
   def self.timer(name)
     Metriks::Registry.default.timer(name)
   end
