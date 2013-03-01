@@ -69,9 +69,26 @@ Set the current value.
   gauge.set(queue.size)
 ```
 
+### callback(callable = nil, &block)
+
+Set the callback that is called to measure the value.
+
+**WARNING:** The code in the callback is executed every time the `#value`
+method is called on the gauge. Most of the time this will be done by a
+metriks reporter that is running in a separate thread.
+
+``` ruby
+  gauge = Metriks.gauge('queue_size')
+  gauge.callback { queue.size } # Callback as block
+
+  callable = proc { queue.size }
+  gauge.callback(callable)      # Callback as object responding to #call
+```
+
 ### value()
 
-Returns the value.
+Returns the value returned by the callback (if one is defined), returns the
+value set via `#set` (or the default of 0) otherwise.
 
 ``` ruby
   gauge = Metriks.gauge('queue_size')
