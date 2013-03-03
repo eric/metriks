@@ -49,52 +49,11 @@ module Metriks::Reporter
       @last_write = Time.now
 
       @registry.each do |name, metric|
-        case metric
-        when Metriks::Meter
-          log_metric name, 'meter', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
-        when Metriks::Counter
-          log_metric name, 'counter', metric, [
-            :count
-          ]
-        when Metriks::UtilizationTimer
-          log_metric name, 'utilization_timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Timer
-          log_metric name, 'timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Histogram
-          log_metric name, 'histogram', metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        end
+        log_metrics name, metric.metric_type, metric.export_values
       end
     end
 
-    def extract_from_metric(metric, *keys)
-      keys.flatten.collect do |key|
-        name = key.to_s.gsub(/^get_/, '')
-        [ { name => metric.send(key) } ]
-      end
-    end
-
-    def log_metric(name, type, metric, keys, snapshot_keys = [])
+    def log_metrics(name, type, values)
       message = []
 
       message << @prefix if @prefix
@@ -102,12 +61,7 @@ module Metriks::Reporter
 
       message << { :name => name }
       message << { :type => type }
-      message += extract_from_metric(metric, keys)
-
-      unless snapshot_keys.empty?
-        snapshot = metric.snapshot
-        message += extract_from_metric(snapshot, snapshot_keys)
-      end
+      message << values
 
       @logger.add(@log_level, format_message(message))
     end

@@ -11,7 +11,7 @@ module Metriks::Reporter
       @registry = options[:registry] || Metrics::Registry.default
       @interval = options[:interval] || 60
       @on_error = options[:on_error] || proc { |ex| }
-      
+
       @default_event = options[:default_event] || {}
       @default_event[:ttl] ||= @interval * 1.5
     end
@@ -20,7 +20,7 @@ module Metriks::Reporter
       @thread ||= Thread.new do
         loop do
           sleep @interval
-          
+
           Thread.new do
             begin
               write
@@ -53,62 +53,17 @@ module Metriks::Reporter
       @last_write = Time.now
 
       @registry.each do |name, metric|
-        case metric
-        when Metriks::Meter
-          send_metric name, 'meter', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
-        when Metriks::Counter
-          send_metric name, 'counter', metric, [
-            :count
-          ]
-        when Metriks::UtilizationTimer
-          send_metric name, 'utilization_timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Timer
-          send_metric name, 'timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Histogram
-          send_metric name, 'histogram', metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        end
+        send_metric name, metric.metric_type, metric.export_values
       end
     end
 
-    def send_metric(name, type, metric, keys, snapshot_keys = [])
-      keys.each do |key|
+    def send_metric(name, type, values)
+      values.each_pair do |key, value|
         @client << @default_event.merge(
           :service => "#{name} #{key}",
-          :metric => metric.send(key),
+          :metric => value,
           :tags => [type]
         )
-      end
-
-      unless snapshot_keys.empty?
-        snapshot = metric.snapshot
-        snapshot_keys.each do |key|
-          @client << @default_event.merge(
-            :service => "#{name} #{key}",
-            :metric => snapshot.send(key),
-            :tags => [type]
-          )
-        end
       end
     end
   end

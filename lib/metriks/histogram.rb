@@ -1,9 +1,12 @@
 require 'atomic'
 require 'metriks/uniform_sample'
 require 'metriks/exponentially_decaying_sample'
+require 'metriks/exportable'
 
 module Metriks
   class Histogram
+    include Metriks::Exportable
+
     DEFAULT_SAMPLE_SIZE = 1028
     DEFAULT_ALPHA = 0.015
 
@@ -107,6 +110,15 @@ module Metriks
 
         new_values
       end
+    end
+
+    private
+    def exportable_metrics
+      [:count, :min, :max, :mean, :stddev]
+    end
+
+    def exportable_snapshots
+      [:median, :get_95th_percentile]
     end
   end
 end

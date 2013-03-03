@@ -196,4 +196,26 @@ class HistogramTest < Test::Unit::TestCase
 
     assert_equal 5, @histogram.min
   end
+
+  def test_export_values
+    @histogram = Metriks::Histogram.new(Metriks::ExponentiallyDecayingSample.new(Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA))
+
+    thread 10 do
+      100.times do |idx|
+        @histogram.update(idx)
+      end
+    end
+
+    expected = {
+      :count    => 1000,
+      :min      => 0,
+      :max      => 99,
+      :mean     => 49,
+      :stddev   => 57.323642591866054,
+      :median   => 49.5,
+      :"95th_percentile" => 94.94999999999993,
+    }
+
+    assert_equal expected, @histogram.export_values
+  end
 end

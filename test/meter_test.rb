@@ -35,4 +35,25 @@ class MeterTest < Test::Unit::TestCase
 
     assert_equal 200, @meter.one_minute_rate
   end
+
+  def test_export_values
+    @meter.mark 1000
+    @meter.tick
+
+    expected = {
+     :count               => 1000,
+     :one_minute_rate     => 200.0,
+     :five_minute_rate    => 200.0,
+     :fifteen_minute_rate => 200.0,
+    }
+
+    exported = @meter.export_values
+
+    expected.each_pair do |metric, value|
+      assert_equal value, exported[metric]
+    end
+
+    # This value changes wildly
+    assert exported[:mean_rate] > 0
+  end
 end

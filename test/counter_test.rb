@@ -36,4 +36,10 @@ class CounterTest < Test::Unit::TestCase
 
     assert_equal 10000, @counter.count
   end
+
+  def test_export_values
+    @counter.increment 10
+
+    assert_equal({:count => 10}, @counter.export_values)
+  end
 end

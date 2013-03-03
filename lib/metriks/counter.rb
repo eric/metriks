@@ -1,9 +1,12 @@
 require 'atomic'
+require 'metriks/exportable'
 
 module Metriks
   # Public: Counters are one of the simplest metrics whose only operations
   # are increment and decrement.
   class Counter
+    include Metriks::Exportable
+
     # Public: Initialize a new Counter.
     def initialize
       @count = Atomic.new(0)
@@ -39,6 +42,11 @@ module Metriks
     # Returns the count.
     def count
       @count.value
+    end
+
+    private
+    def exportable_metrics
+      [:count]
     end
   end
 end
