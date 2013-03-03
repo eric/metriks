@@ -49,11 +49,11 @@ module Metriks::Reporter
       @last_write = Time.now
 
       @registry.each do |name, metric|
-        log_metrics name, metric.export_values
+        log_metrics name, metric.metric_type, metric.export_values
       end
     end
 
-    def log_metrics(name, values)
+    def log_metrics(name, type, values)
       message = []
 
       message << @prefix if @prefix
@@ -61,7 +61,7 @@ module Metriks::Reporter
 
       message << { :name => name }
       message << { :type => type }
-      message.merge!(values)
+      message << values
 
       @logger.add(@log_level, format_message(message))
     end

@@ -11,7 +11,7 @@ module Metriks::Reporter
       @registry = options[:registry] || Metrics::Registry.default
       @interval = options[:interval] || 60
       @on_error = options[:on_error] || proc { |ex| }
-      
+
       @default_event = options[:default_event] || {}
       @default_event[:ttl] ||= @interval * 1.5
     end
@@ -20,7 +20,7 @@ module Metriks::Reporter
       @thread ||= Thread.new do
         loop do
           sleep @interval
-          
+
           Thread.new do
             begin
               write
@@ -53,7 +53,7 @@ module Metriks::Reporter
       @last_write = Time.now
 
       @registry.each do |name, metric|
-        send_metric name, 'meter', metric.export_values
+        send_metric name, metric.metric_type, metric.export_values
       end
     end
 

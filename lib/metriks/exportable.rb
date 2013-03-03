@@ -2,6 +2,13 @@
 module Metriks
   module Exportable
 
+    # Public: Get the type of this metric
+    #
+    # This key is used by certain reporters such as logger
+    def metric_type
+      self.class.name.split('::').last.gsub(/(.)([A-Z])/, '\1_\2').downcase
+    end
+
     # Public: Export all of the Metric's computed values as a hash
     def export_values
       values = capture_metrics(self, exportable_metrics)
