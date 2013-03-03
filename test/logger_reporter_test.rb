@@ -30,6 +30,22 @@ class LoggerReporterTest < Test::Unit::TestCase
     @registry.stop
   end
 
+  def test_includes_name
+    @reporter.write
+
+    ['meter', 'counter', 'timer', 'histogram', 'utilization_timer'].each do |metric|
+      assert_match /\ name=#{metric}\.testing /, @stringio.string
+    end
+  end
+
+  def test_includes_type
+    @reporter.write
+
+    ['meter', 'counter', 'timer', 'histogram', 'utilization_timer'].each do |metric|
+      assert_match /\ type=#{metric} /, @stringio.string
+    end
+  end
+
   def test_write
     @reporter.write
 
