@@ -79,11 +79,13 @@ module Metriks
     #
     # Examples
     #
-    #   registry.gauge('disk_space.used')
+    #   registry.gauge('disk_space.used') { 1 }
     #
     # Returns the Metriks::Gauge identified by the name.
-    def gauge(name)
-      add_or_get(name, Metriks::Gauge)
+    def gauge(name, callable = nil, &block)
+      add_or_get(name, Metriks::Gauge) do
+        Metriks::Gauge.new(callable, &block)
+      end
     end
 
     # Public: Fetch or create a new meter metric. Meters are a counter that

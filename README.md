@@ -60,6 +60,22 @@ Return the current value of the counter.
 
 A gauge is an instantaneous measurement of a value.
 
+It takes a callback to measure the value in form of a block or a callable
+object.
+
+**WARNING:** The code in the callback is executed every time the `#value`
+method is called on the gauge. Most of the time this will be done by a
+metriks reporter that is running in a separate thread.
+
+``` ruby
+  # Callback as block
+  gauge = Metriks.gauge('queue.size') { queue.size }
+
+  # Callback as object responding to #call
+  callable = proc { queue.size }
+  gauge = Metriks.gauge('queue.size', callable)
+```
+
 ### set(val)
 
 Set the current value.
@@ -67,22 +83,6 @@ Set the current value.
 ``` ruby
   gauge = Metriks.gauge('queue_size')
   gauge.set(queue.size)
-```
-
-### callback(callable = nil, &block)
-
-Set the callback that is called to measure the value.
-
-**WARNING:** The code in the callback is executed every time the `#value`
-method is called on the gauge. Most of the time this will be done by a
-metriks reporter that is running in a separate thread.
-
-``` ruby
-  gauge = Metriks.gauge('queue_size')
-  gauge.callback { queue.size } # Callback as block
-
-  callable = proc { queue.size }
-  gauge.callback(callable)      # Callback as object responding to #call
 ```
 
 ### value()

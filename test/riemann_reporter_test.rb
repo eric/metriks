@@ -36,7 +36,7 @@ class RiemannReporterTest < Test::Unit::TestCase
     @registry.timer('timer.testing').update(1.5)
     @registry.histogram('histogram.testing').update(1.5)
     @registry.utilization_timer('utilization_timer.testing').update(1.5)
-    @registry.gauge('gauge.testing').set(123)
+    @registry.gauge('gauge.testing') { 123 }
 
     @reporter.client.expects(:<<).at_least_once
     @reporter.client.expects(:<<).with(

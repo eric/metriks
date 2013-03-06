@@ -3,9 +3,9 @@ require 'atomic'
 module Metriks
   class Gauge
     # Public: Initialize a new Gauge.
-    def initialize
+    def initialize(callable = nil, &block)
       @gauge = Atomic.new(0)
-      @callback = Atomic.new(proc {})
+      @callback = callable || block || proc {}
     end
 
     # Public: Set a new value.
@@ -17,23 +17,11 @@ module Metriks
       @gauge.value = val
     end
 
-    # Public: Set a callback.
-    #
-    # callable - The callback to execute when `#value` is called.
-    #            Takes an object that responds to `#call` as first parameter
-    #            or a block.
-    #
-    # Returns nothing.
-    def callback(callable = nil, &block)
-      callable ||= block
-      @callback.value = callable
-    end
-
     # Public: The current value.
     #
     # Returns the gauge value.
     def value
-      @callback.value.call || @gauge.value
+      @callback.call || @gauge.value
     end
   end
 end

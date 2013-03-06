@@ -10,8 +10,8 @@ module Metriks
     Metriks::Registry.default.counter(name)
   end
 
-  def self.gauge(name)
-    Metriks::Registry.default.gauge(name)
+  def self.gauge(name, callable = nil, &block)
+    Metriks::Registry.default.gauge(name, callable, &block)
   end
 
   def self.timer(name)
