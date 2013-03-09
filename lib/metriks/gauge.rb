@@ -5,7 +5,7 @@ module Metriks
     # Public: Initialize a new Gauge.
     def initialize(callable = nil, &block)
       @gauge = Atomic.new(0)
-      @callback = callable || block || proc {}
+      @callback = callable || block
     end
 
     # Public: Set a new value.
@@ -21,7 +21,7 @@ module Metriks
     #
     # Returns the gauge value.
     def value
-      @callback.call || @gauge.value
+      @callback ? @callback.call : @gauge.value
     end
   end
 end
