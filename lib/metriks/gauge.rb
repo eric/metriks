@@ -4,7 +4,7 @@ module Metriks
   class Gauge
     # Public: Initialize a new Gauge.
     def initialize(callable = nil, &block)
-      @gauge = Atomic.new(0)
+      @gauge = Atomic.new(nil)
       @callback = callable || block
     end
 

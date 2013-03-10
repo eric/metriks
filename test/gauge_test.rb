@@ -19,7 +19,7 @@ class GaugeTest < Test::Unit::TestCase
 
   def test_gauge_default
     gauge = Metriks::Gauge.new
-    assert_equal 0, gauge.value
+    assert_equal nil, gauge.value
   end
 
   def test_gauge_callback_via_block
