@@ -56,6 +56,10 @@ module Metriks::Reporter
           prepare_metric name, metric, [
             :count
           ]
+        when Metriks::Gauge
+          prepare_metric name, metric, [
+            :value
+          ]
         when Metriks::UtilizationTimer
           prepare_metric name, metric, [
             :count, :one_minute_rate, :five_minute_rate,

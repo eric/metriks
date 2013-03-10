@@ -23,6 +23,7 @@ class LoggerReporterTest < Test::Unit::TestCase
     @registry.timer('timer.testing').update(1.5)
     @registry.histogram('histogram.testing').update(1.5)
     @registry.utilization_timer('utilization_timer.testing').update(1.5)
+    @registry.gauge('gauge.testing').set(123)
   end
 
   def teardown
@@ -35,6 +36,7 @@ class LoggerReporterTest < Test::Unit::TestCase
 
     assert_match /time=\d/, @stringio.string
     assert_match /median=\d/, @stringio.string
+    assert_match /value=123/, @stringio.string
   end
 
   def test_flush
@@ -42,5 +44,6 @@ class LoggerReporterTest < Test::Unit::TestCase
 
     assert_match /time=\d/, @stringio.string
     assert_match /median=\d/, @stringio.string
+    assert_match /value=123/, @stringio.string
   end
 end
