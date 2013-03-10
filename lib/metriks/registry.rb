@@ -2,6 +2,7 @@ require 'metriks/counter'
 require 'metriks/timer'
 require 'metriks/utilization_timer'
 require 'metriks/meter'
+require 'metriks/gauge'
 
 module Metriks
   # Public: A collection of metrics
@@ -70,6 +71,21 @@ module Metriks
     # Returns the Metriks::Counter identified by the name.
     def counter(name)
       add_or_get(name, Metriks::Counter)
+    end
+
+    # Public: Fetch or create a new gauge metric.
+    #
+    # name - The String name of the metric to define or fetch
+    #
+    # Examples
+    #
+    #   registry.gauge('disk_space.used') { 1 }
+    #
+    # Returns the Metriks::Gauge identified by the name.
+    def gauge(name, callable = nil, &block)
+      add_or_get(name, Metriks::Gauge) do
+        Metriks::Gauge.new(callable, &block)
+      end
     end
 
     # Public: Fetch or create a new meter metric. Meters are a counter that

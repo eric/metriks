@@ -63,6 +63,10 @@ module Metriks::Reporter
           send_metric name, 'counter', metric, [
             :count
           ]
+        when Metriks::Gauge
+          send_metric name, 'gauge', metric, [
+            :value
+          ]
         when Metriks::UtilizationTimer
           send_metric name, 'utilization_timer', metric, [
             :count, :one_minute_rate, :five_minute_rate,

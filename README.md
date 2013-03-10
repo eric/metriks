@@ -56,6 +56,45 @@ Return the current value of the counter.
   puts "counter: #{counter.count}"
 ```
 
+## Gauges
+
+A gauge is an instantaneous measurement of a value.
+
+It takes a callback to measure the value in form of a block or a callable
+object.
+
+**WARNING:** The code in the callback is executed every time the `#value`
+method is called on the gauge. Most of the time this will be done by a
+metriks reporter that is running in a separate thread.
+
+``` ruby
+  # Callback as block
+  gauge = Metriks.gauge('queue.size') { queue.size }
+
+  # Callback as object responding to #call
+  callable = proc { queue.size }
+  gauge = Metriks.gauge('queue.size', callable)
+```
+
+### set(val)
+
+Set the current value.
+
+``` ruby
+  gauge = Metriks.gauge('queue_size')
+  gauge.set(queue.size)
+```
+
+### value()
+
+Returns the value returned by the callback (if one is defined), returns the
+value set via `#set` (or the default of 0) otherwise.
+
+``` ruby
+  gauge = Metriks.gauge('queue_size')
+  puts "queue size: #{gauge.value}"
+```
+
 ## Meters
 
 A meter that measures the mean throughput and the one-, five-, and

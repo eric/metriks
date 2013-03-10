@@ -58,6 +58,10 @@ module Metriks::Reporter
           write_metric name, metric, [
             :count
           ]
+        when Metriks::Gauge
+          write_metric name, metric, [
+            :value
+          ]
         when Metriks::UtilizationTimer
           write_metric name, metric, [
             :count, :one_minute_rate, :five_minute_rate,
