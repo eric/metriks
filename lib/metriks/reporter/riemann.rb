@@ -8,7 +8,7 @@ module Metriks::Reporter
         :host => options[:host],
         :port => options[:port]
       )
-      @registry = options[:registry] || Metrics::Registry.default
+      @registry = options[:registry] || Metriks::Registry.default
       @interval = options[:interval] || 60
       @on_error = options[:on_error] || proc { |ex| }
       
