@@ -3,7 +3,7 @@ module Metriks
     class FlatteningRegistryEnumerator
       def initialize(registry, options = {})
         @registry = registry
-        if options[:counter_derivitive]
+        if options[:counter_derivative]
           @last = Hash.new { |h,k| h[k] = 0 }
         end
       end
