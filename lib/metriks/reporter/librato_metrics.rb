@@ -1,5 +1,5 @@
 require 'metriks/time_tracker'
-require 'net/https'
+require 'librato/metrics'
 
 module Metriks::Reporter
   class LibratoMetrics
@@ -8,6 +8,9 @@ module Metriks::Reporter
     def initialize(email, token, options = {})
       @email = email
       @token = token
+
+      @client = Librato::Metrics::Client.new
+      @client.authenticate(@email, @token)
 
       @prefix = options[:prefix]
       @source = options[:source]
@@ -44,142 +47,23 @@ module Metriks::Reporter
     end
 
     def write
-      gauges = []
-      @registry.each do |name, metric|
-        gauges << case metric
-        when Metriks::Meter
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
-        when Metriks::Counter
-          prepare_metric name, metric, [
-            :count
-          ]
-        when Metriks::Gauge
-          prepare_metric name, metric, [
-            :value
-          ]
-        when Metriks::UtilizationTimer
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Timer
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Histogram
-          prepare_metric name, metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
+      time  = @time_tracker.now_floored
+      queue = @client.new_queue
+
+      Metriks::Reporter::CounterDerivative.new(@registry).each do |name, value|
+        if prefix
+          name = "#{prefix}.#{name}"
         end
-      end
 
-      gauges.flatten!
-
-      unless gauges.empty?
-        submit(form_data(gauges.flatten))
-      end
-    end
-
-    def submit(data)
-      url = URI.parse('https://metrics-api.librato.com/v1/metrics')
-      req = Net::HTTP::Post.new(url.path)
-      req.basic_auth(@email, @token)
-      req.set_form_data(data)
-
-      http = Net::HTTP.new(url.host, url.port)
-      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      http.use_ssl = true
-      store = OpenSSL::X509::Store.new
-      store.set_default_paths
-      http.cert_store = store
-
-      case res = http.start { |http| http.request(req) }
-      when Net::HTTPSuccess, Net::HTTPRedirection
-        # OK
-      else
-        res.error!
-      end
-    end
-
-    def form_data(metrics)
-      data = {}
-
-      gauges = metrics.select { |m| m[:type] == "gauge" }
-
-      gauges.each_with_index do |gauge, idx|
-        gauge.each do |key, value|
-          if value
-            data["gauges[#{idx}][#{key}]"] = value.to_s
-          end
-        end
-      end
-
-      counters = metrics.select { |m| m[:type] == "counter" }
-
-      counters.each_with_index do |counter, idx|
-        counter.each do |key, value|
-          if value
-            data["counters[#{idx}][#{key}]"] = value.to_s
-          end
-        end
-      end
-
-      data
-    end
-
-    def prepare_metric(base_name, metric, keys, snapshot_keys = [])
-      results = []
-      time = @time_tracker.now_floored
-
-      base_name = base_name.to_s.gsub(/ +/, '_')
-      if @prefix
-        base_name = "#{@prefix}.#{base_name}"
-      end
-
-      keys.flatten.each do |key|
-        name = key.to_s.gsub(/^get_/, '')
-        value = metric.send(key)
-
-        results << {
-          :type => name.to_s == "count" ? "counter" : "gauge",
-          :name => "#{base_name}.#{name}",
-          :source => @source,
+        queue.add name => {
+          :source       => @source,
+          :value        => value,
           :measure_time => time,
-          :value => value
+          :type         => 'gauge'
         }
       end
 
-      unless snapshot_keys.empty?
-        snapshot = metric.snapshot
-        snapshot_keys.flatten.each do |key|
-          name = key.to_s.gsub(/^get_/, '')
-          value = snapshot.send(key)
-
-          results << {
-            :type => name.to_s == "count" ? "counter" : "gauge",
-            :name => "#{base_name}.#{name}",
-            :source => @source,
-            :measure_time => time,
-            :value => value
-          }
-        end
-      end
-
-      results
+      queue.submit
     end
   end
 end
