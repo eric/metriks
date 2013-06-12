@@ -76,6 +76,7 @@ Gem::Specification.new do |s|
     lib/metriks/timer.rb
     lib/metriks/uniform_sample.rb
     lib/metriks/utilization_timer.rb
+    lib/metriks/gauge.rb
     metriks.gemspec
     test/counter_test.rb
     test/graphite_reporter_test.rb
