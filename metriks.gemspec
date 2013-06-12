@@ -67,6 +67,7 @@ Gem::Specification.new do |s|
     lib/metriks/registry.rb
     lib/metriks/reporter/graphite.rb
     lib/metriks/reporter/librato_metrics.rb
+    lib/metriks/reporter/sematext_metrics.rb
     lib/metriks/reporter/logger.rb
     lib/metriks/reporter/proc_title.rb
     lib/metriks/reporter/riemann.rb
@@ -92,6 +93,7 @@ Gem::Specification.new do |s|
     test/thread_error_handling_tests.rb
     test/timer_test.rb
     test/utilization_timer_test.rb
+    test/sematext_reporter_test.rb
   ]
   # = MANIFEST =
 
