@@ -2,7 +2,7 @@ module Metriks::Reporter
   class Riemann
     require 'riemann/client'
 
-    attr_accessor :client
+    attr_accessor :client, :percentile_methods
     def initialize(options = {})
       @client = ::Riemann::Client.new(
         :host => options[:host],
@@ -14,6 +14,7 @@ module Metriks::Reporter
       
       @default_event = options[:default_event] || {}
       @default_event[:ttl] ||= @interval * 1.5
+      @percentile_methods = Metriks::Snapshot.methods_for_percentiles(options[:percentiles] || :p95)
     end
 
     def start
@@ -55,49 +56,27 @@ module Metriks::Reporter
       @registry.each do |name, metric|
         case metric
         when Metriks::Meter
-          send_metric name, 'meter', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
+          send_metric name, 'meter', metric, metric.class.reportable_metrics
         when Metriks::Counter
-          send_metric name, 'counter', metric, [
-            :count
-          ]
+          send_metric name, 'counter', metric, metric.class.reportable_metrics
         when Metriks::Gauge
-          send_metric name, 'gauge', metric, [
-            :value
-          ]
+          send_metric name, 'gauge', metric, metric.class.reportable_metrics
         when Metriks::UtilizationTimer
-          send_metric name, 'utilization_timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
+          send_metric name, 'utilization_timer', metric, metric.class.reportable_metrics,
+            metric.class.reportable_snapshot_metrics(:percentiles => percentile_methods)
         when Metriks::Timer
-          send_metric name, 'timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
+          send_metric name, 'timer', metric, metric.class.reportable_metrics,
+            metric.class.reportable_snapshot_metrics(:percentiles => percentile_methods)
         when Metriks::Histogram
-          send_metric name, 'histogram', metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
+          send_metric name, 'histogram', metric, metric.class.reportable_metrics,
+            metric.class.reportable_snapshot_metrics(:percentiles => percentile_methods)
         end
       end
     end
 
     def send_metric(name, type, metric, keys, snapshot_keys = [])
       keys.each do |key|
-        @client << @default_event.merge(
+        client << @default_event.merge(
           :service => "#{name} #{key}",
           :metric => metric.send(key),
           :tags => [type]
@@ -107,7 +86,7 @@ module Metriks::Reporter
       unless snapshot_keys.empty?
         snapshot = metric.snapshot
         snapshot_keys.each do |key|
-          @client << @default_event.merge(
+          client << @default_event.merge(
             :service => "#{name} #{key}",
             :metric => snapshot.send(key),
             :tags => [type]

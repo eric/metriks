@@ -2,7 +2,7 @@ require 'socket'
 
 module Metriks::Reporter
   class Graphite
-    attr_reader :host, :port
+    attr_reader :host, :port, :percentile_methods
 
     def initialize(host, port, options = {})
       @host = host
@@ -10,9 +10,11 @@ module Metriks::Reporter
 
       @prefix = options[:prefix]
 
-      @registry  = options[:registry] || Metriks::Registry.default
-      @interval  = options[:interval] || 60
-      @on_error  = options[:on_error] || proc { |ex| }
+      @registry = options[:registry] || Metriks::Registry.default
+      @interval = options[:interval] || 60
+      @on_error = options[:on_error] || proc { |ex| }
+
+      @percentile_methods = Metriks::Snapshot.methods_for_percentiles(options[:percentiles] || :p95)
     end
 
     def socket
@@ -48,45 +50,8 @@ module Metriks::Reporter
 
     def write
       @registry.each do |name, metric|
-        case metric
-        when Metriks::Meter
-          write_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
-        when Metriks::Counter
-          write_metric name, metric, [
-            :count
-          ]
-        when Metriks::Gauge
-          write_metric name, metric, [
-            :value
-          ]
-        when Metriks::UtilizationTimer
-          write_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Timer
-          write_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Histogram
-          write_metric name, metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        end
+        write_metric name, metric, metric.class.reportable_metrics,
+          metric.class.reportable_snapshot_metrics(:percentiles => percentile_methods)
       end
     end
 
