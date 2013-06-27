@@ -43,4 +43,12 @@ class GaugeTest < Test::Unit::TestCase
 
     assert_equal 123, gauge.value
   end
+
+  def test_has_no_reportable_snapshot_metrics
+    assert_equal [], Metriks::Gauge.reportable_snapshot_metrics
+  end
+
+  def test_has_reportable_metrics
+    assert_not_empty Metriks::Gauge.reportable_metrics
+  end
 end

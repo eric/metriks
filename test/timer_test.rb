@@ -29,4 +29,12 @@ class TimerTest < Test::Unit::TestCase
 
     assert_in_delta 0.1, @timer.mean, 0.01
   end
+
+  def test_has_reportable_snapshot_metrics
+    assert_not_empty Metriks::Timer.reportable_snapshot_metrics
+  end
+
+  def test_has_reportable_metrics
+    assert_not_empty Metriks::Timer.reportable_metrics
+  end
 end
