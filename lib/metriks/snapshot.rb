@@ -1,5 +1,7 @@
 module Metriks
   class Snapshot
+    VALID_PERCENTILES = [:p75, :p95, :p98, :p99, :p999]
+
     MEDIAN_Q = 0.5
     P75_Q = 0.75
     P95_Q = 0.95
@@ -54,6 +56,29 @@ module Metriks
 
     def get_999th_percentile
       value(P999_Q)
+    end
+
+    def self.valid_percentile?(percentile)
+      VALID_PERCENTILES.include?(percentile)
+    end
+
+    # Public: Convert symbol percentiles into an array of methods to be called
+    # on a Snapshot object.
+    #
+    # percentiles - A symbol, or list of symbols, that represents the percentile
+    # that a method is needed for.
+    #
+    # Example:
+    #   Metriks::Snapshot.methods_for_percentiles(:p95, :p99)
+    #   # => [:get_95th_percentile, :get_99th_percentile]
+    #
+    # Returns an array of symbols
+    def self.methods_for_percentiles(*percentiles)
+      methods = percentiles.flatten.collect do |percentile|
+        next unless valid_percentile?(percentile)
+        :"get_#{percentile.to_s.gsub('p', '')}th_percentile"
+      end
+      methods.compact
     end
   end
 end
