@@ -1,5 +1,6 @@
 require 'metriks/time_tracker'
-require 'librato/metrics'
+require 'net/https'
+require 'metriks/reporter/flattening_registry_enumerator'
 
 module Metriks::Reporter
   class LibratoMetrics
@@ -9,20 +10,17 @@ module Metriks::Reporter
       @email = email
       @token = token
 
-      @client = Librato::Metrics::Client.new
-      @client.authenticate(@email, @token)
-
       @prefix = options[:prefix]
       @source = options[:source]
 
-      @registry  = options[:registry] || Metriks::Registry.default
+      @registry     = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
-      @on_error  = options[:on_error] || proc { |ex| }
+      @on_error     = options[:on_error] || proc { |ex| }
     end
 
     def start
       @thread ||= Thread.new do
-        loop do
+        while true
           @time_tracker.sleep
 
           Thread.new do
@@ -46,24 +44,46 @@ module Metriks::Reporter
       start
     end
 
+    def submit(data)
+      url = URI.parse('https://metrics-api.librato.com/v1/metrics')
+      req = Net::HTTP::Post.new(url.path)
+      req.basic_auth(@email, @token)
+      req.set_form_data(data)
+
+      http = Net::HTTP.new(url.host, url.port)
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      http.use_ssl = true
+      store = OpenSSL::X509::Store.new
+      store.set_default_paths
+      http.cert_store = store
+
+      case res = http.start { |http| http.request(req) }
+      when Net::HTTPSuccess, Net::HTTPRedirection
+        # OK
+      else
+        res.error!
+      end
+    end
+
     def write
       time  = @time_tracker.now_floored
-      queue = @client.new_queue
 
-      Metriks::Reporter::CounterDerivative.new(@registry).each do |name, value|
+      enumerator = Metriks::Reporter::FlatteningRegistryEnumerator.new(@registry)
+
+      data = {}
+
+      enumerator.each_with_index do |name, value, klass, idx|
         if prefix
           name = "#{prefix}.#{name}"
         end
 
-        queue.add name => {
-          :source       => @source,
-          :value        => value,
-          :measure_time => time,
-          :type         => 'gauge'
-        }
+        data["gauges[#{idx}][name]"] = name.to_s
+        data["gauges[#{idx}][source]"] = @source
+        data["gauges[#{idx}][measure_time]"] = time.to_i
+        data["gauges[#{idx}][value]"] = value
       end
 
-      queue.submit
+      submit(data)
     end
   end
 end

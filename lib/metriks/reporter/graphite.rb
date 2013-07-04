@@ -59,7 +59,6 @@ module Metriks::Reporter
         name = "#{@prefix}.#{name}"
       end
 
-      name = name.to_s.gsub(/ +/, '_')
       socket.write("#{name} #{value} #{time}\n")
     rescue Errno::EPIPE
       socket.close

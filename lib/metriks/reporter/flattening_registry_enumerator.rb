@@ -1,103 +1,115 @@
 module Metriks
   module Reporter
     class FlatteningRegistryEnumerator
+      include Enumerable
+
       def initialize(registry, options = {})
         @registry = registry
-        if options[:counter_derivative]
+        unless options[:current_rate]
           @last = Hash.new { |h,k| h[k] = 0 }
         end
+
+        if options[:percentiles]
+          @percentiles = options[:percentiles]
+        else
+          @percentiles = [ 0.75, 0.95, 0.98, 0.99, 0.999 ]
+        end
       end
-      
+
       def each(&block)
         @registry.each do |name, metric|
-          case metric
-          when Metriks::Meter
-            if @last
-              count = metric.count
-              block.call("#{name}.count", count - @last["#{name}.count"])
-              @last["#{name}.count"] = count
-            else
-              block.call("#{name}.count", metric.count)
-              block.call("#{name}.one_minute_rate", metric.one_minute_rate)
-              block.call("#{name}.five_minute_rate", metric.five_minute_rate)
-              block.call("#{name}.fifteen_minute_rate", metric.fifteen_minute_rate)
-              block.call("#{name}.mean_rate", metric.mean_rate)
-            end
+          for_metric(name, metric, &block)
+        end
+      end
 
-          when Metriks::Counter
-            block.call("#{name}.count", metric.count)
-          when Metriks::Gauge
-            block.call("#{name}.value", metric.value)
-          when Metriks::UtilizationTimer
-            if @last
-              count = metric.count
-              block.call("#{name}.count", count - @last["#{name}.count"])
-              @last["#{name}.count"] = count
-            else
-              block.call("#{name}.one_minute_rate", metric.one_minute_rate)
-              block.call("#{name}.five_minute_rate", metric.five_minute_rate)
-              block.call("#{name}.fifteen_minute_rate", metric.fifteen_minute_rate)
-            end
+      def for_metric(name, metric, &block)
+        name = name.to_s.gsub(/ +/, '_')
 
-            block.call("#{name}.min", metric.min)
-            block.call("#{name}.max", metric.max)
-            block.call("#{name}.median", metric.median)
-            block.call("#{name}.stddev", metric.stddev)
-
-            block.call("#{name}.one_minute_utilization", metric.one_minute_utilization)
-            block.call("#{name}.five_minute_utilization", metric.five_minute_utilization)
-            block.call("#{name}.fifteen_minute_utilization", metric.fifteen_minute_utilization)
-            
-            snapshot = metric.snapshot
-
-            block.call("#{name}.median", snapshot.median)
-            block.call("#{name}.75th_percentile", snapshot.get_75th_percentile)
-            block.call("#{name}.95th_percentile", snapshot.get_95th_percentile)
-            block.call("#{name}.98th_percentile", snapshot.get_98th_percentile)
-            block.call("#{name}.99th_percentile", snapshot.get_99th_percentile)
-            block.call("#{name}.999th_percentile", snapshot.get_999th_percentile)
-          when Metriks::Timer
-            if @last
-              count = metric.count
-              block.call("#{name}.count", count - @last["#{name}.count"])
-              @last["#{name}.count"] = count
-            else
-              block.call("#{name}.count", metric.count)
-              block.call("#{name}.one_minute_rate", metric.one_minute_rate)
-              block.call("#{name}.five_minute_rate", metric.five_minute_rate)
-              block.call("#{name}.fifteen_minute_rate", metric.fifteen_minute_rate)
-              block.call("#{name}.mean_rate", metric.mean_rate)
-            end
-
-            block.call("#{name}.min", metric.min)
-            block.call("#{name}.max", metric.max)
-            block.call("#{name}.median", metric.median)
-            block.call("#{name}.stddev", metric.stddev)
-            
-            snapshot = metric.snapshot
-
-            block.call("#{name}.median", snapshot.median)
-            block.call("#{name}.75th_percentile", snapshot.get_75th_percentile)
-            block.call("#{name}.95th_percentile", snapshot.get_95th_percentile)
-            block.call("#{name}.98th_percentile", snapshot.get_98th_percentile)
-            block.call("#{name}.99th_percentile", snapshot.get_99th_percentile)
-            block.call("#{name}.999th_percentile", snapshot.get_999th_percentile)
-          when Metriks::Histogram
-            block.call("#{name}.count", metric.count)
-            block.call("#{name}.min", metric.min)
-            block.call("#{name}.max", metric.max)
-            block.call("#{name}.median", metric.median)
-            block.call("#{name}.stddev", metric.stddev)
-            
-            snapshot = metric.snapshot
-
-            block.call("#{name}.median", snapshot.median)
-            block.call("#{name}.75th_percentile", snapshot.get_75th_percentile)
-            block.call("#{name}.95th_percentile", snapshot.get_95th_percentile)
-            block.call("#{name}.98th_percentile", snapshot.get_98th_percentile)
-            block.call("#{name}.99th_percentile", snapshot.get_99th_percentile)
-            block.call("#{name}.999th_percentile", snapshot.get_999th_percentile)
+        case metric
+        when Metriks::Meter
+          if @last
+            count = metric.count
+            block.call(name, count - @last[name], metric.class)
+            @last[name] = count
+          else
+            block.call("#{name}.count", metric.count, metric.class)
+            block.call("#{name}.one_minute_rate", metric.one_minute_rate, metric.class)
+            block.call("#{name}.five_minute_rate", metric.five_minute_rate, metric.class)
+            block.call("#{name}.fifteen_minute_rate", metric.fifteen_minute_rate, metric.class)
+            block.call("#{name}.mean_rate", metric.mean_rate, metric.class)
           end
+
+        when Metriks::Counter
+          block.call("#{name}", metric.count, metric.class)
+        when Metriks::Gauge
+          block.call("#{name}", metric.value, metric.class)
+        when Metriks::UtilizationTimer
+          if @last
+            count = metric.count
+            block.call(name, count - @last[name], metric.class)
+            @last[name] = count
+          else
+            block.call("#{name}.one_minute_rate", metric.one_minute_rate, metric.class)
+            block.call("#{name}.five_minute_rate", metric.five_minute_rate, metric.class)
+            block.call("#{name}.fifteen_minute_rate", metric.fifteen_minute_rate, metric.class)
+          end
+
+          block.call("#{name}.min", metric.min, metric.class)
+          block.call("#{name}.max", metric.max, metric.class)
+          block.call("#{name}.stddev", metric.stddev, metric.class)
+
+          block.call("#{name}.one_minute_utilization", metric.one_minute_utilization, metric.class)
+          block.call("#{name}.five_minute_utilization", metric.five_minute_utilization, metric.class)
+          block.call("#{name}.fifteen_minute_utilization", metric.fifteen_minute_utilization, metric.class)
+
+          snapshot = metric.snapshot
+
+          block.call("#{name}.median", snapshot.median, metric.class)
+
+          for_percentiles(name, metric, snapshot, &block)
+
+        when Metriks::Timer
+          if @last
+            count = metric.count
+            block.call(name, count - @last[name], metric.class)
+            @last["#{name}.count"] = count
+          else
+            block.call("#{name}.count", metric.count, metric.class)
+            block.call("#{name}.one_minute_rate", metric.one_minute_rate, metric.class)
+            block.call("#{name}.five_minute_rate", metric.five_minute_rate, metric.class)
+            block.call("#{name}.fifteen_minute_rate", metric.fifteen_minute_rate, metric.class)
+            block.call("#{name}.mean_rate", metric.mean_rate, metric.class)
+          end
+
+          block.call("#{name}.min", metric.min, metric.class)
+          block.call("#{name}.max", metric.max, metric.class)
+          block.call("#{name}.stddev", metric.stddev, metric.class)
+
+          snapshot = metric.snapshot
+
+          block.call("#{name}.median", snapshot.median, metric.class)
+
+          for_percentiles(name, metric, snapshot, &block)
+
+        when Metriks::Histogram
+          block.call("#{name}.count", metric.count, metric.class)
+          block.call("#{name}.min", metric.min, metric.class)
+          block.call("#{name}.max", metric.max, metric.class)
+          block.call("#{name}.stddev", metric.stddev, metric.class)
+
+          snapshot = metric.snapshot
+
+          block.call("#{name}.median", snapshot.median, metric.class)
+
+          for_percentiles(name, metric, snapshot, &block)
+        end
+      end
+
+
+      def for_percentiles(name, metric, snapshot, &block)
+        @percentiles.each do |percentile|
+          percentile_name = (percentile * 100).to_f.to_s.gsub(/0+$/, '').gsub('.', '')
+          block.call("#{name}.#{percentile_name}th_percentile", snapshot.value(percentile), metric.class)
         end
       end
     end
