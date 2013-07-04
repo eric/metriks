@@ -1,4 +1,5 @@
 require 'socket'
+require 'metriks/reporter/flattening_registry_enumerator'
 
 module Metriks::Reporter
   class Graphite
