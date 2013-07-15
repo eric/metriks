@@ -72,7 +72,7 @@ module Metriks::Reporter
 
       data = {}
 
-      enumerator.each_with_index do |name, value, klass, idx|
+      enumerator.each_with_index do |(name, value, klass), idx|
         if prefix
           name = "#{prefix}.#{name}"
         end
