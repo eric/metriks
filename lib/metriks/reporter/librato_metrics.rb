@@ -118,22 +118,10 @@ module Metriks::Reporter
     def form_data(metrics)
       data = {}
 
-      gauges = metrics.select { |m| m[:type] == "gauge" }
-
-      gauges.each_with_index do |gauge, idx|
+      metrics.each_with_index do |gauge, idx|
         gauge.each do |key, value|
           if value
             data["gauges[#{idx}][#{key}]"] = value.to_s
-          end
-        end
-      end
-
-      counters = metrics.select { |m| m[:type] == "counter" }
-
-      counters.each_with_index do |counter, idx|
-        counter.each do |key, value|
-          if value
-            data["counters[#{idx}][#{key}]"] = value.to_s
           end
         end
       end
@@ -155,7 +143,7 @@ module Metriks::Reporter
         value = metric.send(key)
 
         results << {
-          :type => name.to_s == "count" ? "counter" : "gauge",
+          :type => "gauge",
           :name => "#{base_name}.#{name}",
           :source => @source,
           :measure_time => time,
@@ -170,7 +158,7 @@ module Metriks::Reporter
           value = snapshot.send(key)
 
           results << {
-            :type => name.to_s == "count" ? "counter" : "gauge",
+            :type => "gauge",
             :name => "#{base_name}.#{name}",
             :source => @source,
             :measure_time => time,
