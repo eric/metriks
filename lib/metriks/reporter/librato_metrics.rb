@@ -83,7 +83,7 @@ module Metriks::Reporter
         data["gauges[#{idx}][value]"] = value
       end
 
-      submit(data)
+      submit(data) unless data.empty?
     end
   end
 end
