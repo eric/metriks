@@ -35,4 +35,9 @@ class LibratoMetricsReporterTest < Test::Unit::TestCase
 
     @reporter.write
   end
+
+  def test_empty_write
+    @reporter.expects(:submit).never
+    @reporter.write
+  end
 end
