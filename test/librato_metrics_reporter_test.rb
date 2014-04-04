@@ -31,5 +31,13 @@ class LibratoMetricsReporterTest < Test::Unit::TestCase
     @reporter.expects(:submit)
 
     @reporter.write
+
+    @reporter.data.detect { |(k,v)| k =~ /gauges\[\d+\]\[name\]/ && v == 'gauge.testing' } &&
+      @reporter.data.detect { |(k,v)| k =~ /gauges\[\d+\]\[value\]/ && v.to_s == '123' }
+  end
+
+  def test_empty_write
+    @reporter.expects(:submit).never
+    @reporter.write
   end
 end

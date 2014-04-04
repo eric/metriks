@@ -3,7 +3,7 @@ require 'net/https'
 
 module Metriks::Reporter
   class LibratoMetrics
-    attr_accessor :prefix, :source
+    attr_accessor :prefix, :source, :data
 
     def initialize(email, token, options = {})
       @email = email
@@ -12,14 +12,25 @@ module Metriks::Reporter
       @prefix = options[:prefix]
       @source = options[:source]
 
-      @registry  = options[:registry] || Metriks::Registry.default
+      @registry     = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
-      @on_error  = options[:on_error] || proc { |ex| }
+      @on_error     = options[:on_error] || proc { |ex| }
+
+      @data = {}
+      @sent = {}
+
+      @last = Hash.new { |h,k| h[k] = 0 }
+
+      if options[:percentiles]
+        @percentiles = options[:percentiles]
+      else
+        @percentiles = [ 0.95, 0.999 ]
+      end
     end
 
     def start
       @thread ||= Thread.new do
-        loop do
+        while true
           @time_tracker.sleep
 
           Thread.new do
@@ -43,62 +54,13 @@ module Metriks::Reporter
       start
     end
 
-    def write
-      gauges = []
-      @registry.each do |name, metric|
-        gauges << case metric
-        when Metriks::Meter
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
-        when Metriks::Counter
-          prepare_metric name, metric, [
-            :count
-          ]
-        when Metriks::Gauge
-          prepare_metric name, metric, [
-            :value
-          ]
-        when Metriks::UtilizationTimer
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Timer
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Histogram
-          prepare_metric name, metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        end
-      end
+    def submit
+      return if @data.empty?
 
-      gauges.flatten!
-
-      unless gauges.empty?
-        submit(form_data(gauges.flatten))
-      end
-    end
-
-    def submit(data)
       url = URI.parse('https://metrics-api.librato.com/v1/metrics')
       req = Net::HTTP::Post.new(url.path)
       req.basic_auth(@email, @token)
-      req.set_form_data(data)
+      req.set_form_data(@data)
 
       http = Net::HTTP.new(url.host, url.port)
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
@@ -113,61 +75,85 @@ module Metriks::Reporter
       else
         res.error!
       end
+
+      @data.clear
     end
 
-    def form_data(metrics)
-      data = {}
+    def write
+      time = @time_tracker.now_floored
 
-      metrics.each_with_index do |gauge, idx|
-        gauge.each do |key, value|
-          if value
-            data["gauges[#{idx}][#{key}]"] = value.to_s
+      @registry.each do |name, metric|
+        name = name.to_s.gsub(/ +/, '_')
+
+        if prefix
+          name = "#{prefix}.#{name}"
+        end
+
+        case metric
+        when Metriks::Meter
+          count = metric.count
+          datapoint(name, count - @last[name], time, :display_min => 0,
+            :summarize_function => 'sum')
+          @last[name] = count
+        when Metriks::Counter
+          datapoint(name, metric.count, time, :summarize_function => 'average')
+        when Metriks::Gauge
+          datapoint(name, metric.value, time, :summarize_function => 'average')
+        when Metriks::Histogram, Metriks::Timer, Metriks::UtilizationTimer
+          if Metriks::UtilizationTimer === metric || Metriks::Timer === metric
+            count = metric.count
+            datapoint(name, count - @last[name], time, :display_min => 0,
+              :summarize_function => 'sum')
+            @last[name] = count
+          end
+
+          if Metriks::UtilizationTimer === metric
+            datapoint("#{name}.one_minute_utilization",
+              metric.one_minute_utilization, time,
+              :display_min => 0, :summarize_function => 'average')
+          end
+
+          snapshot = metric.snapshot
+
+          datapoint("#{name}.median", snapshot.median, time, :display_min => 0,
+            :summarize_function => 'average')
+
+          @percentiles.each do |percentile|
+            percentile_name = (percentile * 100).to_f.to_s.gsub(/0+$/, '').gsub('.', '')
+            datapoint("#{name}.#{percentile_name}th_percentile",
+              snapshot.value(percentile), time, :display_min => 0,
+              :summarize_function => 'max')
           end
         end
       end
 
-      data
+      if @data.length > 0
+        submit
+      end
     end
 
-    def prepare_metric(base_name, metric, keys, snapshot_keys = [])
-      results = []
-      time = @time_tracker.now_floored
+    def datapoint(name, value, time, attributes = {})
+      idx = @data.length
 
-      base_name = base_name.to_s.gsub(/ +/, '_')
-      if @prefix
-        base_name = "#{@prefix}.#{base_name}"
+      if prefix
+        name = "#{prefix}.#{name}"
       end
 
-      keys.flatten.each do |key|
-        name = key.to_s.gsub(/^get_/, '')
-        value = metric.send(key)
+      @data["gauges[#{idx}][name]"]         = name
+      @data["gauges[#{idx}][source]"]       = @source
+      @data["gauges[#{idx}][measure_time]"] = time.to_i
+      @data["gauges[#{idx}][value]"]        = value
 
-        results << {
-          :type => "gauge",
-          :name => "#{base_name}.#{name}",
-          :source => @source,
-          :measure_time => time,
-          :value => value
-        }
-      end
+      unless @sent[name]
+        @sent[name] = true
 
-      unless snapshot_keys.empty?
-        snapshot = metric.snapshot
-        snapshot_keys.flatten.each do |key|
-          name = key.to_s.gsub(/^get_/, '')
-          value = snapshot.send(key)
+        @data["gauges[#{idx}][period]"] = @time_tracker.interval
+        @data["gauges[#{idx}][attributes][aggregate]"] = true
 
-          results << {
-            :type => "gauge",
-            :name => "#{base_name}.#{name}",
-            :source => @source,
-            :measure_time => time,
-            :value => value
-          }
+        attributes.each do |k, v|
+          @data["gauges[#{idx}][attributes][#{k}]"] = v
         end
       end
-
-      results
     end
   end
 end

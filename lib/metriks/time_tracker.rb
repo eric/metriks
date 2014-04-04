@@ -1,5 +1,7 @@
 module Metriks
   class TimeTracker
+    attr_reader :interval
+
     def initialize(interval)
       @interval = interval
       @next_time = Time.now.to_f
