@@ -52,13 +52,7 @@ module Metriks::Reporter
         val = block.call
         val = "%.#{@rounding}f" % val if val.is_a?(Float)
 
-        if suffix == '%'
-          "#{name}: #{val}#{suffix}"
-        elsif suffix
-          "#{name}: #{val}/#{suffix}"
-        else
-          "#{name}: #{val}"
-        end
+        "#{name}: #{val}#{suffix}"
       end.join(' ')
     end
   end

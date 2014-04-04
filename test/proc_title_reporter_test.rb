@@ -14,7 +14,7 @@ class ProcTitleReporterTest < Test::Unit::TestCase
   end
 
   def test_generate_title
-    @reporter.add 'test', 'sec' do
+    @reporter.add 'test', '/sec' do
       50.333
     end
 
