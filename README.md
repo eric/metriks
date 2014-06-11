@@ -346,12 +346,8 @@ Send metrics to a logger every 60 seconds.
 
 ## Librato Metrics Reporter
 
-Send metrics to Librato Metrics every 60 seconds.
-
-``` ruby
-  reporter = Metriks::Reporter::LibratoMetrics.new('email', 'token')
-  reporter.start
-```
+The Librato Metrics reporter has been moved to
+[eric/metriks-librato_metrics](https://github.com/eric/metriks-librato_metrics).
 
 
 ## Proc Title Reporter
