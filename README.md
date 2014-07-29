@@ -178,7 +178,7 @@ or an object responding to `#call` (normally a `proc` or `lambda`).
 
 ``` ruby
   timer = Metriks.timer('requests')
-  timer.time do
+  work_result = timer.time do
     work
   end
 ```
