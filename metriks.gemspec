@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency('atomic', ["~> 1.0"])
   s.add_dependency('hitimes', [ "~> 1.1"])
-  s.add_dependency('avl_tree', [ "~> 1.1.2" ])
 
   s.add_development_dependency('mocha', ['~> 0.10'])
 
