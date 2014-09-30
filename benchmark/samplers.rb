@@ -86,6 +86,9 @@ reporter.measure :exponential_avl, Metriks::Timer.new(Metriks::ExponentiallyDeca
 reporter.measure :exponential_red_black, Metriks::Timer.new(Metriks::ExponentiallyDecayingSample.new(
   Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA, RedBlackTree.new))
 
+reporter.measure :exponential_concurrent_red_black, Metriks::Timer.new(Metriks::ExponentiallyDecayingSample.new(
+  Metriks::Histogram::DEFAULT_SAMPLE_SIZE, Metriks::Histogram::DEFAULT_ALPHA, ConcurrentRedBlackTree.new))
+
 puts "fib(#{fib_times}): #{iter} iterations"
 puts "-" * 50
 
