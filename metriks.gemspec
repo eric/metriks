@@ -41,7 +41,7 @@ Gem::Specification.new do |s|
   ## that are needed for an end user to actually USE your code.
   s.add_dependency('atomic', ["~> 1.0"])
   s.add_dependency('hitimes', [ "~> 1.1"])
-  s.add_dependency('avl_tree', [ "~> 1.1.2" ])
+  s.add_dependency('avl_tree', [ "~> 1.2.0" ])
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
