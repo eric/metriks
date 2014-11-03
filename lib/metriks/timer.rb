@@ -62,6 +62,10 @@ module Metriks
       @histogram.count
     end
 
+    def sum
+      @histogram.sum
+    end
+
     def one_minute_rate
       @meter.one_minute_rate
     end

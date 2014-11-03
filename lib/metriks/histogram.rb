@@ -50,6 +50,10 @@ module Metriks
       @count.value
     end
 
+    def sum
+      @sum.value
+    end
+
     def max
       count > 0 ? @max.value : 0.0
     end
