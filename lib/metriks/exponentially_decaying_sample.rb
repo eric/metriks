@@ -1,4 +1,4 @@
-require 'atomic'
+require 'concurrent/atomic'
 require 'red_black_tree'
 require 'metriks/snapshot'
 
@@ -8,8 +8,8 @@ module Metriks
 
     def initialize(reservoir_size, alpha, values = nil)
       @values = values || ConcurrentRedBlackTree.new
-      @count = Atomic.new(0)
-      @next_scale_time = Atomic.new(0)
+      @count = Concurrent::Atomic.new(0)
+      @next_scale_time = Concurrent::Atomic.new(0)
       @alpha = alpha
       @reservoir_size = reservoir_size
       @mutex = Mutex.new

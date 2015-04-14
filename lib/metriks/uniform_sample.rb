@@ -1,11 +1,11 @@
-require 'atomic'
+require 'concurrent/atomic'
 require 'metriks/snapshot'
 
 module Metriks
   class UniformSample
     def initialize(reservoir_size)
       @values = Array.new(reservoir_size, 0)
-      @count  = Atomic.new(0)
+      @count  = Concurrent::Atomic.new(0)
     end
 
     def clear
