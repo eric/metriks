@@ -1,4 +1,4 @@
-require 'atomic'
+require 'concurrent/atomic'
 
 module Metriks
   class EWMA
@@ -30,8 +30,8 @@ module Metriks
       @interval = interval
 
       @initialized = false
-      @rate        = Atomic.new(0.0)
-      @uncounted   = Atomic.new(0)
+      @rate        = Concurrent::Atomic.new(0.0)
+      @uncounted   = Concurrent::Atomic.new(0)
     end
 
     def clear

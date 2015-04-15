@@ -1,4 +1,4 @@
-require 'atomic'
+require 'concurrent/atomic'
 
 require 'metriks/ewma'
 
@@ -7,9 +7,9 @@ module Metriks
     TICK_INTERVAL = 5.0
 
     def initialize(averager_klass = Metriks::EWMA)
-      @count = Atomic.new(0)
+      @count = Concurrent::Atomic.new(0)
       @start_time = Time.now.to_f
-      @last_tick = Atomic.new(@start_time)
+      @last_tick = Concurrent::Atomic.new(@start_time)
 
       @m1_rate  = averager_klass.new_m1
       @m5_rate  = averager_klass.new_m5

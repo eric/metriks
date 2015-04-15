@@ -1,10 +1,10 @@
-require 'atomic'
+require 'concurrent/atomic'
 
 module Metriks
   class Gauge
     # Public: Initialize a new Gauge.
     def initialize(callable = nil, &block)
-      @gauge = Atomic.new(nil)
+      @gauge = Concurrent::Atomic.new(nil)
       @callback = callable || block
     end
 

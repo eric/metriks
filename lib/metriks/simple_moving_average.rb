@@ -1,4 +1,4 @@
-require 'atomic'
+require 'concurrent/atomic'
 
 module Metriks
   class SimpleMovingAverage
@@ -25,8 +25,8 @@ module Metriks
       @interval = interval
       @duration = duration
 
-      @values = Array.new((duration / interval).to_i) { Atomic.new(nil) }
-      @index  = Atomic.new(0)
+      @values = Array.new((duration / interval).to_i) { Concurrent::Atomic.new(nil) }
+      @index  = Concurrent::Atomic.new(0)
     end
 
     def clear

@@ -1,4 +1,4 @@
-require 'atomic'
+require 'concurrent/atomic'
 require 'metriks/uniform_sample'
 require 'metriks/exponentially_decaying_sample'
 
@@ -17,11 +17,11 @@ module Metriks
 
     def initialize(sample)
       @sample   = sample
-      @count    = Atomic.new(0)
-      @min      = Atomic.new(nil)
-      @max      = Atomic.new(nil)
-      @sum      = Atomic.new(0)
-      @variance = Atomic.new([ -1, 0 ])
+      @count    = Concurrent::Atomic.new(0)
+      @min      = Concurrent::Atomic.new(nil)
+      @max      = Concurrent::Atomic.new(nil)
+      @sum      = Concurrent::Atomic.new(0)
+      @variance = Concurrent::Atomic.new([ -1, 0 ])
     end
 
     def clear
