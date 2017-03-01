@@ -377,6 +377,21 @@ will display:
 
 Depending on how your application server operates, you may need to configure how reporters are created. Please look at [Troubleshooting](https://github.com/eric/metriks/wiki/Troubleshooting) for more information.
 
+## Instrumental Reporter
+
+Send metrics to [Instrumental][instrumental] every 60 seconds.
+
+``` ruby
+  # Using an API key
+  reporter = Metriks::Reporter::Instrumental.new(:api_key => "Your Instrumental API key")
+
+  # Using an already instantiated agent
+  reporter = Metriks::Reporter::Instrumental.new(:agent => existing_instrumental_agent)
+
+  reporter.start
+```
+
+
 # Plans
 
 An incomplete list of things I would like to see added:
@@ -396,7 +411,7 @@ Most of the inspiration for this project comes from Coda Hale's amazing
 
 [metrics-talk]: http://pivotallabs.com/talks/139-metrics-metrics-everywhere
 [metrics]: https://github.com/codahale/metrics
-
+[instrumental]: https://instrumentalapp.com/
 
 # License
 
