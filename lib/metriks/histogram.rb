@@ -1,4 +1,3 @@
-require 'atomic'
 require 'metriks/uniform_sample'
 require 'metriks/exponentially_decaying_sample'
 

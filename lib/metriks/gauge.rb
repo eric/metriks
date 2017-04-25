@@ -1,5 +1,3 @@
-require 'atomic'
-
 module Metriks
   class Gauge
     # Public: Initialize a new Gauge.

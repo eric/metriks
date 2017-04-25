@@ -1,5 +1,3 @@
-require 'atomic'
-
 module Metriks
   class SimpleMovingAverage
     INTERVAL = 5.0

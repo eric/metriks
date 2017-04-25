@@ -1,4 +1,3 @@
-require 'atomic'
 require 'red_black_tree'
 require 'metriks/snapshot'
 

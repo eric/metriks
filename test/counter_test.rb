@@ -28,7 +28,7 @@ class CounterTest < Test::Unit::TestCase
 
     assert_equal 10, @counter.count
   end
-  
+
   def test_increment_by_more_threaded
     thread 10, :n => 100 do
       @counter.increment 10

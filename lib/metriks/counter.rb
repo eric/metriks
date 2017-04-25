@@ -1,5 +1,3 @@
-require 'atomic'
-
 module Metriks
   # Public: Counters are one of the simplest metrics whose only operations
   # are increment and decrement.

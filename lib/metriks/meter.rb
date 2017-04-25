@@ -1,5 +1,3 @@
-require 'atomic'
-
 require 'metriks/ewma'
 
 module Metriks

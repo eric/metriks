@@ -1,3 +1,4 @@
+require 'concurrent'
 
 module Metriks
   VERSION = '0.9.9.7'
@@ -29,6 +30,8 @@ module Metriks
   def self.histogram(name)
     Metriks::Registry.default.histogram(name)
   end
+
+  Atomic = Concurrent::AtomicReference
 end
 
 require 'metriks/registry'
