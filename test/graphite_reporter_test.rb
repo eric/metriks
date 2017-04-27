@@ -35,7 +35,7 @@ class GraphiteReporterTest < Test::Unit::TestCase
     @reporter.write
 
     assert_match /timer.testing.median \d/, @stringio.string
-    assert_match /gauge.testing.value 123/, @stringio.string
-    assert_match /gauge.testing.block.value 456/, @stringio.string
+    assert_match /gauge.testing 123/, @stringio.string
+    assert_match /gauge.testing.block 456/, @stringio.string
   end
 end

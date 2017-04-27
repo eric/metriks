@@ -1,5 +1,6 @@
 require 'metriks/time_tracker'
 require 'net/https'
+require 'metriks/reporter/flattening_registry_enumerator'
 
 module Metriks::Reporter
   class LibratoMetrics
@@ -12,14 +13,14 @@ module Metriks::Reporter
       @prefix = options[:prefix]
       @source = options[:source]
 
-      @registry  = options[:registry] || Metriks::Registry.default
+      @registry     = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
-      @on_error  = options[:on_error] || proc { |ex| }
+      @on_error     = options[:on_error] || proc { |ex| }
     end
 
     def start
       @thread ||= Thread.new do
-        loop do
+        while true
           @time_tracker.sleep
 
           Thread.new do
@@ -43,57 +44,6 @@ module Metriks::Reporter
       start
     end
 
-    def write
-      gauges = []
-      @registry.each do |name, metric|
-        gauges << case metric
-        when Metriks::Meter
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
-        when Metriks::Counter
-          prepare_metric name, metric, [
-            :count
-          ]
-        when Metriks::Gauge
-          prepare_metric name, metric, [
-            :value
-          ]
-        when Metriks::UtilizationTimer
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Timer
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Histogram
-          prepare_metric name, metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        end
-      end
-
-      gauges.flatten!
-
-      unless gauges.empty?
-        submit(form_data(gauges.flatten))
-      end
-    end
-
     def submit(data)
       url = URI.parse('https://metrics-api.librato.com/v1/metrics')
       req = Net::HTTP::Post.new(url.path)
@@ -115,59 +65,25 @@ module Metriks::Reporter
       end
     end
 
-    def form_data(metrics)
+    def write
+      time  = @time_tracker.now_floored
+
+      enumerator = Metriks::Reporter::FlatteningRegistryEnumerator.new(@registry)
+
       data = {}
 
-      metrics.each_with_index do |gauge, idx|
-        gauge.each do |key, value|
-          if value
-            data["gauges[#{idx}][#{key}]"] = value.to_s
-          end
+      enumerator.each_with_index do |(name, value, klass), idx|
+        if prefix
+          name = "#{prefix}.#{name}"
         end
+
+        data["gauges[#{idx}][name]"] = name.to_s
+        data["gauges[#{idx}][source]"] = @source
+        data["gauges[#{idx}][measure_time]"] = time.to_i
+        data["gauges[#{idx}][value]"] = value
       end
 
-      data
-    end
-
-    def prepare_metric(base_name, metric, keys, snapshot_keys = [])
-      results = []
-      time = @time_tracker.now_floored
-
-      base_name = base_name.to_s.gsub(/ +/, '_')
-      if @prefix
-        base_name = "#{@prefix}.#{base_name}"
-      end
-
-      keys.flatten.each do |key|
-        name = key.to_s.gsub(/^get_/, '')
-        value = metric.send(key)
-
-        results << {
-          :type => "gauge",
-          :name => "#{base_name}.#{name}",
-          :source => @source,
-          :measure_time => time,
-          :value => value
-        }
-      end
-
-      unless snapshot_keys.empty?
-        snapshot = metric.snapshot
-        snapshot_keys.flatten.each do |key|
-          name = key.to_s.gsub(/^get_/, '')
-          value = snapshot.send(key)
-
-          results << {
-            :type => "gauge",
-            :name => "#{base_name}.#{name}",
-            :source => @source,
-            :measure_time => time,
-            :value => value
-          }
-        end
-      end
-
-      results
+      submit(data) unless data.empty?
     end
   end
 end

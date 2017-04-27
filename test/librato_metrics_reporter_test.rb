@@ -28,8 +28,16 @@ class LibratoMetricsReporterTest < Test::Unit::TestCase
     @registry.utilization_timer('utilization_timer.testing').update(1.5)
     @registry.gauge('gauge.testing') { 123 }
 
-    @reporter.expects(:submit)
+    @reporter.expects(:submit).with do |data|
+      data.detect { |(k,v)| k =~ /gauges\[\d+\]\[name\]/ && v == 'gauge.testing' } &&
+      data.detect { |(k,v)| k =~ /gauges\[\d+\]\[value\]/ && v.to_s == '123' }
+    end
 
+    @reporter.write
+  end
+
+  def test_empty_write
+    @reporter.expects(:submit).never
     @reporter.write
   end
 end
