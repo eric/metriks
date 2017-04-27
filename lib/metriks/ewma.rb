@@ -1,5 +1,3 @@
-require 'atomic'
-
 module Metriks
   class EWMA
     INTERVAL = 5.0

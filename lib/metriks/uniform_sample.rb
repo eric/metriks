@@ -1,4 +1,4 @@
-require 'atomic'
+require 'concurrent'
 require 'metriks/snapshot'
 
 module Metriks

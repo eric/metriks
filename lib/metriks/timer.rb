@@ -1,4 +1,4 @@
-require 'atomic'
+require 'concurrent'
 require 'hitimes'
 
 require 'metriks/meter'
