@@ -40,5 +40,23 @@ module Metriks
     def count
       @count.value
     end
+
+    # Public: An array of methods to be used for reporting metrics through a
+    # reporter.
+    #
+    # Returns an array of symbols of methods that can be called.
+    def self.reportable_metrics
+      [:count]
+    end
+
+    # Public: An array of methods to be used for reporting snapshot metrics
+    # through a reporter.
+    #
+    # options - No supported options.
+    #
+    # Returns an array of symbols of methods that can be called.
+    def self.reportable_snapshot_metrics(options = {})
+      []
+    end
   end
 end

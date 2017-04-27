@@ -373,6 +373,19 @@ will display:
 
 [metriks-sematext](https://github.com/sematext/metriks-sematext) gem provides reporter for sending metrics to [SPM](http://sematext.com/spm/index.html).
 
+## Custom percentile reporting
+
+The Graphite, LibratoMetrics, Logger, and Riemann reporters all support
+reporting customized percentiles for histograms, timers, and utilization timers.
+By default, these reporters will report the p95 for these metric types.  The
+example below shows how to enable a custom set of percentile metrics
+
+``` ruby
+  Metriks::Reporter::Graphite.new('localhost', 3004, :percentiles => [:p95, :p99])
+```
+
+These percentiles are supported: `:p75, :p95, :p98, :p99, :p999`.
+
 # Application Server Configuration
 
 Depending on how your application server operates, you may need to configure how reporters are created. Please look at [Troubleshooting](https://github.com/eric/metriks/wiki/Troubleshooting) for more information.

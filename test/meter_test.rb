@@ -35,4 +35,12 @@ class MeterTest < Test::Unit::TestCase
 
     assert_equal 200, @meter.one_minute_rate
   end
+
+  def test_has_no_reportable_snapshot_metrics
+    assert_equal [], Metriks::Meter.reportable_snapshot_metrics
+  end
+
+  def test_has_reportable_metrics
+    assert_not_empty Metriks::Meter.reportable_metrics
+  end
 end

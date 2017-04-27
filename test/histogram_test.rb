@@ -196,4 +196,12 @@ class HistogramTest < Test::Unit::TestCase
 
     assert_equal 5, @histogram.min
   end
+
+  def test_has_reportable_snapshot_metrics
+    assert_not_empty Metriks::Histogram.reportable_snapshot_metrics
+  end
+
+  def test_has_reportable_metrics
+    assert_not_empty Metriks::Histogram.reportable_metrics
+  end
 end

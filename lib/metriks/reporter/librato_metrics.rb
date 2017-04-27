@@ -3,7 +3,7 @@ require 'net/https'
 
 module Metriks::Reporter
   class LibratoMetrics
-    attr_accessor :prefix, :source
+    attr_accessor :prefix, :source, :percentile_methods
 
     def initialize(email, token, options = {})
       @email = email
@@ -11,6 +11,7 @@ module Metriks::Reporter
 
       @prefix = options[:prefix]
       @source = options[:source]
+      @percentile_methods = Metriks::Snapshot.methods_for_percentiles(options[:percentiles] || :p95)
 
       @registry  = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
@@ -46,45 +47,8 @@ module Metriks::Reporter
     def write
       gauges = []
       @registry.each do |name, metric|
-        gauges << case metric
-        when Metriks::Meter
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
-        when Metriks::Counter
-          prepare_metric name, metric, [
-            :count
-          ]
-        when Metriks::Gauge
-          prepare_metric name, metric, [
-            :value
-          ]
-        when Metriks::UtilizationTimer
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Timer
-          prepare_metric name, metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        when Metriks::Histogram
-          prepare_metric name, metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
-        end
+        gauges << prepare_metric(name, metric, metric.class.reportable_metrics,
+                                 metric.class.reportable_snapshot_metrics(:percentiles => percentile_methods))
       end
 
       gauges.flatten!

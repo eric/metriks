@@ -85,4 +85,41 @@ class RiemannReporterTest < Test::Unit::TestCase
 
     @reporter.write
   end
+
+def test_custom_percentiles_for_timers
+    @reporter = build_reporter(:percentiles => :p999)
+    @registry.timer('timer.testing').update(1.5)
+    mock_snapshot = @registry.timer('timer.testing').snapshot
+    mock_snapshot.expects(:get_999th_percentile)
+    @registry.timer('timer.testing').stubs(:snapshot).returns(mock_snapshot)
+
+    @reporter.stubs(:client).returns([])
+    @reporter.write
+  end
+
+  def test_custom_percentiles_for_utilization_timers
+    @reporter = build_reporter(:percentiles => :p999)
+    @registry.utilization_timer('utilization_timer.testing').update(1.5)
+    mock_snapshot = @registry.utilization_timer('utilization_timer.testing').snapshot
+    mock_snapshot.expects(:get_999th_percentile)
+    @registry.utilization_timer('utilization_timer.testing').stubs(:snapshot).returns(mock_snapshot)
+
+    @reporter.stubs(:client).returns([])
+    @reporter.write
+  end
+
+  def test_custom_percentiles_for_histograms
+    @reporter = build_reporter(:percentiles => :p999)
+    @registry.histogram('histogram.testing').update(1.5)
+    mock_snapshot = @registry.histogram('histogram.testing').snapshot
+    mock_snapshot.expects(:get_999th_percentile)
+    @registry.histogram('histogram.testing').stubs(:snapshot).returns(mock_snapshot)
+
+    @reporter.stubs(:client).returns([])
+    @reporter.write
+  end
+
+  def test_default_percentile
+    assert_equal [:get_95th_percentile], @reporter.percentile_methods
+  end
 end

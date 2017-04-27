@@ -36,4 +36,12 @@ class CounterTest < Test::Unit::TestCase
 
     assert_equal 10000, @counter.count
   end
+
+  def test_has_no_reportable_snapshot_metrics
+    assert_equal [], Metriks::Counter.reportable_snapshot_metrics
+  end
+
+  def test_has_reportable_metrics
+    assert_not_empty Metriks::Counter.reportable_metrics
+  end
 end

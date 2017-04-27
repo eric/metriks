@@ -22,4 +22,12 @@ class UtilizationTimerTest < Test::Unit::TestCase
 
     assert_in_delta 0.25, @timer.one_minute_utilization, 0.1
   end
+
+  def test_has_reportable_snapshot_metrics
+    assert_not_empty Metriks::UtilizationTimer.reportable_snapshot_metrics
+  end
+
+  def test_has_reportable_metrics
+    assert_not_empty Metriks::UtilizationTimer.reportable_metrics
+  end
 end

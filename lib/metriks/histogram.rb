@@ -112,5 +112,24 @@ module Metriks
         new_values
       end
     end
+
+    # Public: An array of methods to be used for reporting metrics through a
+    # reporter.
+    #
+    # Returns an array of symbols of methods that can be called.
+    def self.reportable_metrics
+      [:count, :min, :max, :mean, :stddev]
+    end
+
+    # Public: An array of methods to be used for reporting snapshot metrics
+    # through a reporter.
+    #
+    # options[:percentiles] - An array of percentiles methods to include. These
+    # must be valid methods on Metriks::Snapshot.
+    #
+    # Returns an array of symbols of methods that can be called.
+    def self.reportable_snapshot_metrics(options = {})
+      [:median] + options.fetch(:percentiles, [])
+    end
   end
 end

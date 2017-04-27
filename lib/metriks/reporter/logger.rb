@@ -3,7 +3,7 @@ require 'metriks/time_tracker'
 
 module Metriks::Reporter
   class Logger
-    attr_accessor :prefix, :log_level, :logger
+    attr_accessor :prefix, :log_level, :logger, :percentile_methods
 
     def initialize(options = {})
       @logger    = options[:logger]    || ::Logger.new(STDOUT)
@@ -13,6 +13,8 @@ module Metriks::Reporter
       @registry     = options[:registry] || Metriks::Registry.default
       @time_tracker = Metriks::TimeTracker.new(options[:interval] || 60)
       @on_error     = options[:on_error] || proc { |ex| }
+
+      @percentile_methods = Metriks::Snapshot.methods_for_percentiles(options.fetch(:percentiles, :p95))
     end
 
     def start
@@ -51,42 +53,20 @@ module Metriks::Reporter
       @registry.each do |name, metric|
         case metric
         when Metriks::Meter
-          log_metric name, 'meter', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate
-          ]
+          log_metric name, 'meter', metric, metric.class.reportable_metrics
         when Metriks::Counter
-          log_metric name, 'counter', metric, [
-            :count
-          ]
+          log_metric name, 'counter', metric, metric.class.reportable_metrics
         when Metriks::Gauge
-          log_metric name, 'gauge', metric, [
-            :value
-          ]
+          log_metric name, 'gauge', metric, metric.class.reportable_metrics
         when Metriks::UtilizationTimer
-          log_metric name, 'utilization_timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev,
-            :one_minute_utilization, :five_minute_utilization,
-            :fifteen_minute_utilization, :mean_utilization,
-          ], [
-            :median, :get_95th_percentile
-          ]
+          log_metric name, 'utilization_timer', metric, metric.class.reportable_metrics,
+            metric.class.reportable_snapshot_metrics(:percentiles => percentile_methods)
         when Metriks::Timer
-          log_metric name, 'timer', metric, [
-            :count, :one_minute_rate, :five_minute_rate,
-            :fifteen_minute_rate, :mean_rate,
-            :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
+          log_metric name, 'timer', metric, metric.class.reportable_metrics,
+            metric.class.reportable_snapshot_metrics(:percentiles => percentile_methods)
         when Metriks::Histogram
-          log_metric name, 'histogram', metric, [
-            :count, :min, :max, :mean, :stddev
-          ], [
-            :median, :get_95th_percentile
-          ]
+          log_metric name, 'histogram', metric, metric.class.reportable_metrics,
+            metric.class.reportable_snapshot_metrics(:percentiles => percentile_methods)
         end
       end
     end
